@@ -4,14 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#ffffff"
+    android:background="@color/white"
     android:padding="@dimen/standard_space"
     tools:context=".SettingsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp">
+        android:layout_marginBottom="@dimen/big_space">
 
         <ImageView
             android:id="@+id/arrow_back_image"
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:text="@string/main_button_3"
             android:textColor="@color/black"
-            android:textSize="21sp"
+            android:textSize="@dimen/big_text"
             android:layout_gravity="center_vertical"/>
 
     </LinearLayout>
@@ -37,18 +37,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="@string/setting1"
+            android:text="@string/setting1_dark_theme"
             android:textColor="@color/black"
-            android:textSize="@dimen/text_setting"
+            android:textSize="@dimen/standard_text"
             android:paddingLeft="@dimen/standard_space"/>
 
         <Switch
             android:layout_width="56dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="6dp"
-            android:layout_marginBottom="11dp" />
+            android:layout_height="56dp"
+            android:layout_gravity="end" />
 
     </FrameLayout>
 
@@ -59,9 +56,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/setting2"
+            android:text="@string/setting2_share_app"
             android:textColor="@color/black"
-            android:textSize="@dimen/text_setting"
+            android:textSize="@dimen/standard_text"
             android:paddingLeft="@dimen/standard_space"
             android:layout_gravity="center_vertical" />
 
@@ -69,9 +66,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:paddingTop="@dimen/setting_padding_top"
-            android:paddingRight="@dimen/setting_padding_right"
-            android:paddingBottom="@dimen/setting_padding_bottom"
+            android:paddingTop="@dimen/standard_space"
+            android:paddingRight="@dimen/standard_space"
+            android:paddingBottom="@dimen/standard_space"
             android:src="@drawable/share" />
 
     </FrameLayout>
@@ -84,18 +81,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="@string/setting3"
+            android:text="@string/setting3_support"
             android:textColor="@color/black"
-            android:textSize="@dimen/text_setting"
+            android:textSize="@dimen/standard_text"
             android:paddingLeft="@dimen/standard_space" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:paddingTop="@dimen/setting_padding_top"
-            android:paddingRight="@dimen/setting_padding_right"
-            android:paddingBottom="@dimen/setting_padding_bottom"
+            android:paddingTop="@dimen/standard_space"
+            android:paddingRight="@dimen/standard_space"
+            android:paddingBottom="@dimen/standard_space"
             android:src="@drawable/support" />
 
     </FrameLayout>
@@ -108,18 +105,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="@string/setting4"
+            android:text="@string/setting4_user_agreement"
             android:textColor="@color/black"
-            android:textSize="@dimen/text_setting"
+            android:textSize="@dimen/standard_text"
             android:paddingLeft="@dimen/standard_space" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:paddingTop="@dimen/setting_padding_top"
-            android:paddingRight="@dimen/setting_padding_right"
-            android:paddingBottom="@dimen/setting_padding_bottom"
+            android:paddingTop="@dimen/standard_space"
+            android:paddingRight="@dimen/standard_space"
+            android:paddingBottom="@dimen/standard_space"
             android:src="@drawable/arrow_forward" />
 
     </FrameLayout>

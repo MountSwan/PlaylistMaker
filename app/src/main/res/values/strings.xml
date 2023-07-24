@@ -3,8 +3,8 @@
     <string name="main_button_1" translatable="false">Поиск</string>
     <string name="main_button_2" translatable="false">Медиатека</string>
     <string name="main_button_3" translatable="false">Настройки</string>
-    <string name="setting1" translatable="false">Темная тема</string>
-    <string name="setting2" translatable="false">Поделиться приложением</string>
-    <string name="setting3" translatable="false">Написать в поддержку</string>
-    <string name="setting4" translatable="false">Пользовательское соглашение</string>
+    <string name="setting1_dark_theme" translatable="false">Темная тема</string>
+    <string name="setting2_share_app" translatable="false">Поделиться приложением</string>
+    <string name="setting3_support" translatable="false">Написать в поддержку</string>
+    <string name="setting4_user_agreement" translatable="false">Пользовательское соглашение</string>
 </resources>

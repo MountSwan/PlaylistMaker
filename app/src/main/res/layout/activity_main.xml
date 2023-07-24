@@ -15,23 +15,23 @@
         android:layout_gravity="start"
         android:text="@string/app_name"
         android:textColor="@color/white"
-        android:textSize="22sp" />
+        android:textSize="@dimen/big_text" />
 
     <Button
         android:id="@+id/search_button"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/big_space"
         app:cornerRadius="@dimen/standard_space"
         android:layout_weight="1"
         android:backgroundTint="@color/white"
         app:icon="@drawable/search"
         app:iconGravity="textStart"
-        app:iconTint="#1A1B22"
-        app:iconPadding="@dimen/icon_padding"
+        app:iconTint="@color/black"
+        app:iconPadding="@dimen/small_space"
         android:text="@string/main_button_1"
         android:textColor="@color/black"
-        android:textSize="@dimen/text_button"
+        android:textSize="@dimen/big_text"
         android:textAllCaps="false"/>
 
     <Button
@@ -44,11 +44,11 @@
         android:backgroundTint="@color/white"
         app:icon="@drawable/library"
         app:iconGravity="textStart"
-        app:iconTint="#1A1B22"
-        app:iconPadding="@dimen/icon_padding"
+        app:iconTint="@color/black"
+        app:iconPadding="@dimen/small_space"
         android:text="@string/main_button_2"
         android:textColor="@color/black"
-        android:textSize="@dimen/text_button"
+        android:textSize="@dimen/big_text"
         android:textAllCaps="false"/>
 
     <Button
@@ -61,11 +61,11 @@
         android:backgroundTint="@color/white"
         app:icon="@drawable/settings"
         app:iconGravity="textStart"
-        app:iconTint="#1A1B22"
-        app:iconPadding="@dimen/icon_padding"
+        app:iconTint="@color/black"
+        app:iconPadding="@dimen/small_space"
         android:text="@string/main_button_3"
         android:textColor="@color/black"
-        android:textSize="@dimen/text_button"
+        android:textSize="@dimen/big_text"
         android:textAllCaps="false"/>
 
 </LinearLayout>
