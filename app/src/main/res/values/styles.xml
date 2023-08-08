@@ -4,13 +4,11 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:orientation">vertical</item>
-        <item name="android:padding">@dimen/standard_space</item>
-        <item name="android:background">@color/blue</item>
     </style>
 
-    <style name="ButtonActivityMain" parent="Widget.MaterialComponents.Button">
+    <style name="ButtonActivityMain" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_height">@dimen/zero_space</item>
         <item name="android:layout_weight">1</item>
         <item name="android:backgroundTint">@color/white</item>
         <item name="android:textAllCaps">false</item>
@@ -40,6 +38,23 @@
         <item name="android:paddingTop">@dimen/standard_space</item>
         <item name="android:paddingRight">@dimen/standard_space</item>
         <item name="android:paddingBottom">@dimen/standard_space</item>
+    </style>
+
+    <style name="TextHeaderSettings">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textSize">@dimen/big_text</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_marginStart">@dimen/standard_space</item>
+    </style>
+
+    <style name="ImageEditText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">@dimen/small_space</item>
+        <item name="android:paddingRight">@dimen/small_space</item>
     </style>
 
 </resources>
