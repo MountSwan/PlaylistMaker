@@ -33,8 +33,7 @@
         android:layout_marginEnd="@dimen/standard_space"
         android:layout_marginTop="@dimen/small_space"
         android:layout_marginBottom="@dimen/small_space"
-        app:cornerRadius="@dimen/standard_space"
-        android:background="@drawable/layout_bg">
+        android:background="@drawable/layout_bg" >
 
         <ImageView
             android:id="@+id/searchIcon"
@@ -53,6 +52,7 @@
             android:hint="@string/main_button_1"
             android:maxLines="1"
             android:inputType="text"
+            android:background="@null"
             android:textColor="@color/black"
             android:textColorHint="@color/text_color_hint" />
 
