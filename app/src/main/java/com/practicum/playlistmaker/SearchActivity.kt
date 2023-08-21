@@ -9,6 +9,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.recyclerview.widget.RecyclerView
+import kotlin.random.Random
 
 class SearchActivity : AppCompatActivity() {
 
@@ -26,6 +28,7 @@ class SearchActivity : AppCompatActivity() {
         val inputEditText = findViewById<EditText>(R.id.inputEditText)
         val ivClearButton = findViewById<ImageView>(R.id.clearIcon)
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
 
 
         ivArrowBack.setOnClickListener {
@@ -52,6 +55,17 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         inputEditText.addTextChangedListener(simpleTextWatcher)
+
+        val trackList: MutableList<Track> = mutableListOf()
+        trackList.add(Track(getString(R.string.track_name_track1), getString(R.string.artist_name_track1), getString(R.string.track_time_track1), getString(R.string.artwork_url100_track1)))
+        trackList.add(Track(getString(R.string.track_name_track2), getString(R.string.artist_name_track2), getString(R.string.track_time_track2), getString(R.string.artwork_url100_track2)))
+        trackList.add(Track(getString(R.string.track_name_track3), getString(R.string.artist_name_track3), getString(R.string.track_time_track3), getString(R.string.artwork_url100_track3)))
+        trackList.add(Track(getString(R.string.track_name_track4), getString(R.string.artist_name_track4), getString(R.string.track_time_track4), getString(R.string.artwork_url100_track4)))
+        trackList.add(Track(getString(R.string.track_name_track5), getString(R.string.artist_name_track5), getString(R.string.track_time_track5), getString(R.string.artwork_url100_track5)))
+
+        val trackAdapter = TrackAdapter(trackList)
+        recyclerView.adapter = trackAdapter
+
 
     }
     private fun clearButtonVisibility(textSearch: CharSequence?): Int {
