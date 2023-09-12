@@ -6,11 +6,19 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.random.Random
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
 
@@ -19,16 +27,44 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private var text: String = ""
+    private val iTunesBaseUrl = "https://itunes.apple.com"
+
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(iTunesBaseUrl)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    private val iTunesService = retrofit.create(ITunesApi::class.java)
+
+    private val tracks = ArrayList<Track>()
+    private val adapter = TrackAdapter()
+
+    private lateinit var termInput: EditText
+    private lateinit var placeholderMessage: TextView
+    private lateinit var placeholderImage: ImageView
+    private lateinit var refreshButton: Button
+    private lateinit var tracksList: RecyclerView
+    private lateinit var searchRequest: Editable
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         val ivArrowBack = findViewById<ImageView>(R.id.arrow_back_image)
-        val inputEditText = findViewById<EditText>(R.id.inputEditText)
         val ivClearButton = findViewById<ImageView>(R.id.clearIcon)
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+
+        placeholderMessage = findViewById(R.id.placeholderMessage)
+        placeholderImage = findViewById(R.id.placeholderImage)
+        refreshButton = findViewById(R.id.refreshButton)
+        termInput = findViewById(R.id.inputEditText)
+        tracksList = findViewById(R.id.recyclerView)
+
+        adapter.tracks = tracks
+
+        tracksList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        tracksList.adapter = adapter
 
 
         ivArrowBack.setOnClickListener {
@@ -36,8 +72,10 @@ class SearchActivity : AppCompatActivity() {
         }
 
         ivClearButton.setOnClickListener {
-            inputEditText.setText("")
-            inputMethodManager?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+            termInput.setText("")
+            inputMethodManager?.hideSoftInputFromWindow(termInput.windowToken, 0)
+            tracks.clear()
+            adapter.notifyDataSetChanged()
         }
 
         val simpleTextWatcher = object : TextWatcher {
@@ -54,18 +92,21 @@ class SearchActivity : AppCompatActivity() {
                 // empty
             }
         }
-        inputEditText.addTextChangedListener(simpleTextWatcher)
+        termInput.addTextChangedListener(simpleTextWatcher)
 
-        val trackList: MutableList<Track> = mutableListOf()
-        trackList.add(Track(getString(R.string.track_name_track1), getString(R.string.artist_name_track1), getString(R.string.track_time_track1), getString(R.string.artwork_url100_track1)))
-        trackList.add(Track(getString(R.string.track_name_track2), getString(R.string.artist_name_track2), getString(R.string.track_time_track2), getString(R.string.artwork_url100_track2)))
-        trackList.add(Track(getString(R.string.track_name_track3), getString(R.string.artist_name_track3), getString(R.string.track_time_track3), getString(R.string.artwork_url100_track3)))
-        trackList.add(Track(getString(R.string.track_name_track4), getString(R.string.artist_name_track4), getString(R.string.track_time_track4), getString(R.string.artwork_url100_track4)))
-        trackList.add(Track(getString(R.string.track_name_track5), getString(R.string.artist_name_track5), getString(R.string.track_time_track5), getString(R.string.artwork_url100_track5)))
+        termInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                searchRequest = termInput.text
+                search(searchRequest)
 
-        val trackAdapter = TrackAdapter(trackList)
-        recyclerView.adapter = trackAdapter
+                true
+            }
+            false
+        }
 
+        refreshButton.setOnClickListener {
+            search(searchRequest)
+        }
 
     }
     private fun clearButtonVisibility(textSearch: CharSequence?): Int {
@@ -85,6 +126,54 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         text = savedInstanceState.getString(SEARCH_REQUEST,"")
         findViewById<EditText>(R.id.inputEditText).setText(text)
+    }
+
+    private fun showMessage(text: String, image: Int) {
+        if (text.isNotEmpty()) {
+            placeholderMessage.visibility = View.VISIBLE
+            placeholderImage.visibility = View.VISIBLE
+            tracks.clear()
+            adapter.notifyDataSetChanged()
+            placeholderMessage.text = text
+            placeholderImage.setImageResource(image)
+        } else {
+            placeholderMessage.visibility = View.GONE
+            placeholderImage.visibility = View.GONE
+        }
+    }
+
+    private fun search(searchRequest: Editable) {
+        if (searchRequest.isNotEmpty()) {
+            refreshButton.visibility = View.GONE
+            iTunesService.search(searchRequest.toString()).enqueue(object :
+                Callback<ITunesResponse> {
+                override fun onResponse(call: Call<ITunesResponse>,
+                                        response: Response<ITunesResponse>
+                ) {
+                    if (response.code() == 200) {
+                        tracks.clear()
+                        if (response.body()?.results?.isNotEmpty() == true) {
+                            tracks.addAll(response.body()?.results!!)
+                            adapter.notifyDataSetChanged()
+                        }
+                        if (tracks.isEmpty()) {
+                            showMessage(getString(R.string.nothing_found), R.drawable.no_found)
+                        } else {
+                            showMessage("", R.drawable.no_found)
+                        }
+                    } else {
+                        showMessage(getString(R.string.something_went_wrong), R.drawable.disconnect)
+                        refreshButton.visibility = View.VISIBLE
+                    }
+                }
+
+                override fun onFailure(call: Call<ITunesResponse>, t: Throwable) {
+                    showMessage(getString(R.string.something_went_wrong), R.drawable.disconnect)
+                    refreshButton.visibility = View.VISIBLE
+                }
+
+            })
+        }
     }
 
 }
