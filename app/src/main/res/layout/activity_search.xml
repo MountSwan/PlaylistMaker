@@ -49,11 +49,12 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/edit_text_size"
             android:hint="@string/main_button_1"
-            android:maxLines="1"
             android:inputType="text"
             android:background="@null"
             android:textColor="@color/black"
-            android:textColorHint="@color/text_color_hint" />
+            android:textColorHint="@color/text_color_hint"
+            android:imeOptions="actionDone"
+            android:singleLine="true" />
 
         <ImageView
             android:id="@+id/clearIcon"
@@ -66,12 +67,53 @@
 
     </LinearLayout>
 
+    <FrameLayout android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/standard_space"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/standard_space"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView android:id="@+id/placeholderImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/standard_space"
+                tools:src="@drawable/placeholder" />
+
+            <TextView android:id="@+id/placeholderMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/big_space"
+                android:layout_marginRight="@dimen/big_space"
+                android:layout_marginBottom="@dimen/big_space"
+                android:layout_marginTop="@dimen/standard_space"
+                android:fontFamily="@font/ys_display_medium"
+                android:textSize="@dimen/error_text"
+                android:textAlignment="center"
+                android:textColor="@color/text_color"
+                tools:text="Error"/>
+
+            <Button android:id="@+id/refreshButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/text_color"
+                android:textColor="@color/background_activity_settings"
+                android:fontFamily="@font/ys_display_medium"
+                android:textSize="@dimen/refresh_button_text"
+                android:text="@string/refresh"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </LinearLayout>
