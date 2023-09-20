@@ -15,4 +15,9 @@
     <string name="something_went_wrong" translatable="false">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="nothing_found" translatable="false">Ничего не нашлось</string>
     <string name="refresh" translatable="false">Обновить</string>
+    <string name="track_name" translatable="false">Название композиции</string>
+    <string name="artist_name" translatable="false">Имя исполнителя</string>
+    <string name="track_time" translatable="false">Длительность композиции</string>
+    <string name="title_history" translatable="false">Вы искали</string>
+    <string name="clear_history" translatable="false">Очистить историю</string>
 </resources>
