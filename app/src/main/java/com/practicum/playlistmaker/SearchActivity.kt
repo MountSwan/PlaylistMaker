@@ -22,6 +22,7 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         const val SEARCH_REQUEST = "SEARCH_REQUEST"
         const val EXECUTED_REQUEST = 200
+        const val MAX_NUMBER_TRACKS_IN_SEARCH_HISTORY = 10
     }
 
     private var text: String = ""
@@ -35,7 +36,8 @@ class SearchActivity : AppCompatActivity() {
     private val iTunesService = retrofit.create(ITunesApi::class.java)
 
     private val tracks = ArrayList<Track>()
-    private var tracksInHistory = ArrayList<Track>()
+    private val tracksInHistory = ArrayList<Track>()
+    private var searchHistory: SearchHistory? = null
     private val adapter = TrackAdapter() {
         addInHistory(it)
     }
@@ -52,22 +54,27 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val inputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
 
         adapter.tracks = tracks
 
-        val sharedPrefs: SharedPreferences = getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE)
-        SearchHistory(tracksInHistory).getTracksFromSharedPrefs(sharedPrefs)
+        searchHistory =
+            SearchHistory(getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE))
+        searchHistory?.getTracksFromSharedPrefs(tracksInHistory)
         adapterHistory.tracks = tracksInHistory
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.recyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.adapter = adapter
 
-        binding.recyclerViewOfHistory.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.recyclerViewOfHistory.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.recyclerViewOfHistory.adapter = adapterHistory
 
         binding.inputEditText.setOnFocusChangeListener { view, hasFocus ->
-            binding.historyOfSearch.isVisible = hasFocus && binding.inputEditText.text.isEmpty()
+            binding.historyOfSearch.isVisible =
+                hasFocus && binding.inputEditText.text.isEmpty() && tracksInHistory.size > 0
         }
 
         binding.arrowBackImage.setOnClickListener {
@@ -81,17 +88,29 @@ class SearchActivity : AppCompatActivity() {
             adapter.notifyDataSetChanged()
             binding.placeholderMessage.isVisible = false
             binding.placeholderImage.isVisible = false
+            binding.refreshButton.isVisible = false
         }
 
         val simpleTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(textSearch: CharSequence?, start: Int, count: Int, after: Int) {
+            override fun beforeTextChanged(
+                textSearch: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
                 // empty
             }
 
-            override fun onTextChanged(textSearch: CharSequence?, start: Int, before: Int, count: Int) {
+            override fun onTextChanged(
+                textSearch: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
                 binding.clearIcon.isVisible = clearButtonVisibility(textSearch)
                 text = textSearch.toString()
-                binding.historyOfSearch.isVisible = binding.inputEditText.hasFocus() && textSearch?.isEmpty() == true
+                binding.historyOfSearch.isVisible =
+                    binding.inputEditText.hasFocus() && textSearch?.isEmpty() == true && tracksInHistory.size > 0
             }
 
             override fun afterTextChanged(textSearch: Editable?) {
@@ -115,17 +134,10 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.clearHistoryButton.setOnClickListener {
-            SearchHistory(tracksInHistory).clearHistory()
+            searchHistory?.clearHistory(tracksInHistory)
             binding.historyOfSearch.isVisible = false
         }
 
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        val sharedPrefs: SharedPreferences = getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE)
-        SearchHistory(tracksInHistory).putTracksInSharedPrefs(sharedPrefs)
     }
 
     private fun clearButtonVisibility(textSearch: CharSequence?): Boolean {
@@ -134,12 +146,12 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(SEARCH_REQUEST,text)
+        outState.putString(SEARCH_REQUEST, text)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        text = savedInstanceState.getString(SEARCH_REQUEST,"")
+        text = savedInstanceState.getString(SEARCH_REQUEST, "")
         binding.inputEditText.setText(text)
     }
 
@@ -162,8 +174,9 @@ class SearchActivity : AppCompatActivity() {
             binding.refreshButton.isVisible = false
             iTunesService.search(searchRequest.toString()).enqueue(object :
                 Callback<ITunesResponse> {
-                override fun onResponse(call: Call<ITunesResponse>,
-                                        response: Response<ITunesResponse>
+                override fun onResponse(
+                    call: Call<ITunesResponse>,
+                    response: Response<ITunesResponse>
                 ) {
                     if (response.code() == EXECUTED_REQUEST) {
                         tracks.clear()
@@ -192,7 +205,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun addInHistory(track: Track) {
-        SearchHistory(tracksInHistory).addInHistory(track)
+        searchHistory?.addInHistory(track, tracksInHistory)
         adapterHistory.notifyDataSetChanged()
     }
 

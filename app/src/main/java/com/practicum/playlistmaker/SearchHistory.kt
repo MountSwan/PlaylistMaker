@@ -2,50 +2,44 @@ package com.practicum.playlistmaker
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
+import com.practicum.playlistmaker.SearchActivity.Companion.MAX_NUMBER_TRACKS_IN_SEARCH_HISTORY
 
-class SearchHistory(private val tracksInHistory: ArrayList<Track>) {
+class SearchHistory(private val sharedPrefs: SharedPreferences) {
 
-    fun getTracksFromSharedPrefs(sharedPrefs: SharedPreferences): ArrayList<Track> {
+    fun getTracksFromSharedPrefs(tracksInHistory: ArrayList<Track>) {
 
         val historyInSharedPrefs = sharedPrefs.getString(HISTORY_SEARCH_KEY, null)
 
-        if(historyInSharedPrefs != null) {
-            val tracksFromSharedPrefs = Gson().fromJson(historyInSharedPrefs, Array<Track>::class.java)
-            for(track in tracksFromSharedPrefs) {
-                tracksInHistory.add(track)
-            }
+        if (historyInSharedPrefs != null) {
+            val tracksFromSharedPrefs =
+                Gson().fromJson(historyInSharedPrefs, Array<Track>::class.java)
+            tracksInHistory.addAll(tracksFromSharedPrefs)
         }
-        return tracksInHistory
+
     }
 
-    fun putTracksInSharedPrefs(sharedPrefs: SharedPreferences) {
+    private fun putTracksInSharedPrefs(tracksInHistory: ArrayList<Track>) {
         sharedPrefs.edit()
             .putString(HISTORY_SEARCH_KEY, Gson().toJson(tracksInHistory))
             .apply()
     }
 
-    fun addInHistory(track: Track): ArrayList<Track> {
+    fun addInHistory(track: Track, tracksInHistory: ArrayList<Track>) {
 
-        val iterator = tracksInHistory.iterator()
-        while (iterator.hasNext()) {
-            val nextTrack = iterator.next()
-            if(nextTrack.trackId == track.trackId) {
-                iterator.remove()
-            }
-        }
+        tracksInHistory.removeIf { it.trackId == track.trackId }
 
-        if(tracksInHistory.size == 10) {
-            tracksInHistory.removeAt(9)
+        if (tracksInHistory.size == MAX_NUMBER_TRACKS_IN_SEARCH_HISTORY) {
+            tracksInHistory.removeLast()
         }
 
         tracksInHistory.add(0, track)
 
-        return tracksInHistory
+        putTracksInSharedPrefs(tracksInHistory)
 
     }
 
-    fun clearHistory(): ArrayList<Track> {
+    fun clearHistory(tracksInHistory: ArrayList<Track>) {
         tracksInHistory.clear()
-        return tracksInHistory
+        putTracksInSharedPrefs(tracksInHistory)
     }
 }
