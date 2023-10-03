@@ -11,7 +11,7 @@
         android:layout_height="wrap_content" >
 
         <ImageView
-            android:id="@+id/arrow_back_image"
+            android:id="@+id/arrowBackImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/smallest_space"
@@ -44,44 +44,48 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/inputEditText"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/edit_text_size"
-            android:hint="@string/main_button_1"
-            android:inputType="text"
-            android:background="@null"
-            android:textColor="@color/black"
-            android:textColorHint="@color/text_color_hint"
-            android:imeOptions="actionDone"
-            android:singleLine="true" />
+            <EditText
+                android:id="@+id/inputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edit_text_size"
+                android:hint="@string/main_button_1"
+                android:inputType="text"
+                android:background="@null"
+                android:textColor="@color/black"
+                android:textColorHint="@color/text_color_hint"
+                android:imeOptions="actionDone"
+                android:singleLine="true" />
 
-        <ImageView
-            android:id="@+id/clearIcon"
-            style="@style/ImageEditText"
-            android:layout_gravity="center|end"
-            android:src="@drawable/cancel"
-            android:visibility="gone" />
+            <ImageView
+                android:id="@+id/clearIcon"
+                style="@style/ImageEditText"
+                android:layout_gravity="center|end"
+                android:src="@drawable/cancel"
+                android:visibility="gone" />
 
         </FrameLayout>
 
     </LinearLayout>
 
-    <FrameLayout android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/standard_space"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            >
 
             <ImageView android:id="@+id/placeholderImage"
                 android:layout_width="wrap_content"
@@ -103,6 +107,7 @@
                 tools:text="Error"/>
 
             <Button android:id="@+id/refreshButton"
+                style="@style/ButtonActivitySearch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/text_color"
@@ -114,6 +119,44 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/historyOfSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_history"
+                android:layout_marginLeft="@dimen/big_space"
+                android:layout_marginRight="@dimen/big_space"
+                android:layout_marginTop="@dimen/big_space"
+                android:layout_marginBottom="@dimen/small_space"
+                android:fontFamily="@font/ys_display_medium"
+                android:textSize="@dimen/error_text"
+                android:gravity="center"
+                android:textColor="@color/text_color"
+                android:text="@string/title_history"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewOfHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+            <Button
+                android:id="@+id/clearHistoryButton"
+                style="@style/ButtonActivitySearch"
+                android:layout_weight="0"
+                android:layout_marginTop="@dimen/big_space"
+                android:layout_gravity="center"
+                android:text="@string/clear_history"/>
+
+        </LinearLayout>
+
     </FrameLayout>
+
 
 </LinearLayout>

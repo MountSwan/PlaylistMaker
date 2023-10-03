@@ -27,15 +27,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            style="@style/MenuSettings"
-            android:text="@string/setting1_dark_theme" />
+    <TextView
+        style="@style/MenuSettings"
+        android:text="@string/setting1_dark_theme" />
 
-        <Switch
-            android:id="@+id/switchButton"
-            android:layout_width="@dimen/biggest_size"
-            android:layout_height="@dimen/biggest_size"
-            android:layout_gravity="end" />
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/themeSwitcher"
+        android:layout_gravity="end"
+        android:layout_width="@dimen/biggest_size"
+        android:layout_height="@dimen/biggest_size"/>
 
     </FrameLayout>
 
