@@ -2,14 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/StandardScreen"
-    android:padding="@dimen/standard_space"
+    android:padding="@dimen/four_space"
     android:background="@color/background_activity_settings"
     tools:context=".SettingsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/big_space" >
+        android:layout_marginBottom="@dimen/six_space" >
 
         <ImageView
             android:id="@+id/arrow_back_image"
@@ -34,8 +34,8 @@
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/themeSwitcher"
         android:layout_gravity="end"
-        android:layout_width="@dimen/biggest_size"
-        android:layout_height="@dimen/biggest_size"/>
+        android:layout_width="@dimen/fourteen_space"
+        android:layout_height="@dimen/fourteen_space"/>
 
     </FrameLayout>
 
