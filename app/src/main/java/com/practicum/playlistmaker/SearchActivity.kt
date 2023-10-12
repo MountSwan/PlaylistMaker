@@ -1,7 +1,7 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
-import android.content.SharedPreferences
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -10,6 +10,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.Gson
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -40,9 +41,13 @@ class SearchActivity : AppCompatActivity() {
     private var searchHistory: SearchHistory? = null
     private val adapter = TrackAdapter() {
         addInHistory(it)
+        saveTrackForAudioPlayer(it)
+        startAudioPlayer()
     }
     private val adapterHistory = TrackAdapter() {
         addInHistory(it)
+        saveTrackForAudioPlayer(it)
+        startAudioPlayer()
     }
 
     private lateinit var binding: ActivitySearchBinding
@@ -207,6 +212,18 @@ class SearchActivity : AppCompatActivity() {
     private fun addInHistory(track: Track) {
         searchHistory?.addInHistory(track, tracksInHistory)
         adapterHistory.notifyDataSetChanged()
+    }
+
+    private fun startAudioPlayer() {
+        val audioPlayerIntent = Intent(this, AudioPlayerActivity::class.java)
+        startActivity(audioPlayerIntent)
+    }
+
+    private fun saveTrackForAudioPlayer(track: Track) {
+        val sharedPrefs = getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE)
+        sharedPrefs.edit()
+            .putString(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, Gson().toJson(track))
+            .apply()
     }
 
 }

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatDelegate
 const val PRACTICUM_EXAMPLE_PREFERENCES = "practicum_example_preferences"
 const val EDIT_TEXT_KEY = "key_for_edit_text"
 const val HISTORY_SEARCH_KEY = "key_for_history_search"
+const val SAVE_TRACK_FOR_AUDIO_PLAYER_KEY = "key_for_save_track_for_audio_player"
 
 class App : Application() {
 

@@ -25,7 +25,7 @@ class TrackViewHolder(parent: ViewGroup) :
             .load(model.artworkUrl100)
             .placeholder(R.drawable.placeholder)
             .centerCrop()
-            .transform(RoundedCorners(10))
+            .transform(RoundedCorners(itemView.resources.getDimensionPixelSize(R.dimen.album_cover_corner_radius)))
             .into(ivCover)
         tvTrackName.text = model.trackName
         tvArtistName.text = model.artistName

@@ -13,12 +13,12 @@
         <item name="android:backgroundTint">@color/white</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/black</item>
-        <item name="cornerRadius">@dimen/standard_space</item>
+        <item name="cornerRadius">@dimen/four_space</item>
         <item name="iconGravity">textStart</item>
-        <item name="iconPadding">@dimen/small_space</item>
+        <item name="iconPadding">@dimen/two_space</item>
         <item name="iconTint">@color/black</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
-        <item name="android:textSize">@dimen/big_text</item>
+        <item name="android:textSize">@dimen/twenty_two_size_text</item>
     </style>
 
     <style name="ButtonActivitySearch">
@@ -27,7 +27,7 @@
         <item name="android:backgroundTint">@color/text_color</item>
         <item name="android:textColor">@color/background_activity_settings</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
-        <item name="android:textSize">@dimen/activity_search_button_text</item>
+        <item name="android:textSize">@dimen/fourteen_size_text</item>
     </style>
 
     <style name="MenuSettings">
@@ -35,18 +35,18 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center_vertical</item>
         <item name="android:textColor">@color/black</item>
-        <item name="android:paddingLeft">@dimen/standard_space</item>
+        <item name="android:paddingLeft">@dimen/four_space</item>
         <item name="android:fontFamily">@font/ys_display_regular</item>
-        <item name="android:textSize">@dimen/standard_text</item>
+        <item name="android:textSize">@dimen/sixteen_size_text</item>
     </style>
 
     <style name="IconSettings">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">end</item>
-        <item name="android:paddingTop">@dimen/standard_space</item>
-        <item name="android:paddingRight">@dimen/standard_space</item>
-        <item name="android:paddingBottom">@dimen/standard_space</item>
+        <item name="android:paddingTop">@dimen/four_space</item>
+        <item name="android:paddingRight">@dimen/four_space</item>
+        <item name="android:paddingBottom">@dimen/four_space</item>
     </style>
 
     <style name="TextHeaderSettings">
@@ -54,16 +54,16 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/text_color</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
-        <item name="android:textSize">@dimen/big_text</item>
+        <item name="android:textSize">@dimen/twenty_two_size_text</item>
         <item name="android:layout_gravity">center_vertical</item>
-        <item name="android:layout_marginStart">@dimen/standard_space</item>
+        <item name="android:layout_marginStart">@dimen/four_space</item>
     </style>
 
     <style name="ImageEditText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingLeft">@dimen/small_space</item>
-        <item name="android:paddingRight">@dimen/small_space</item>
+        <item name="android:paddingLeft">@dimen/two_space</item>
+        <item name="android:paddingRight">@dimen/two_space</item>
     </style>
 
     <style name="PropertiesOfTrack">
@@ -71,8 +71,39 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/icon_color</item>
         <item name="android:fontFamily">@font/ys_display_regular</item>
-        <item name="android:textSize">@dimen/small_text</item>
+        <item name="android:textSize">@dimen/eleven_size_text</item>
    </style>
+
+    <style name="TitleOfTrackOnAudioplayer">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+    </style>
+
+    <style name="PropertiesOfTrackOnAudioplayer">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">@dimen/four_space</item>
+        <item name="android:layout_marginStart">@dimen/six_space</item>
+        <item name="android:gravity">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/thirteen_size_text</item>
+    </style>
+
+    <style name="TitlesOfPropertiesOfTrackOnAudioplayer">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">@dimen/four_space</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/thirteen_size_text</item>
+    </style>
 
 
 </resources>
