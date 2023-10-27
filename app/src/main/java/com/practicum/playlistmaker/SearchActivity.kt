@@ -4,13 +4,14 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.gson.Gson
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -24,6 +25,8 @@ class SearchActivity : AppCompatActivity() {
         const val SEARCH_REQUEST = "SEARCH_REQUEST"
         const val EXECUTED_REQUEST = 200
         const val MAX_NUMBER_TRACKS_IN_SEARCH_HISTORY = 10
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
     private var text: String = ""
@@ -39,19 +42,29 @@ class SearchActivity : AppCompatActivity() {
     private val tracks = ArrayList<Track>()
     private val tracksInHistory = ArrayList<Track>()
     private var searchHistory: SearchHistory? = null
-    private val adapter = TrackAdapter() {
-        addInHistory(it)
-        saveTrackForAudioPlayer(it)
-        startAudioPlayer()
+    private val adapter = TrackAdapter {
+        if (clickDebounce()) {
+            addInHistory(it)
+            startAudioPlayer(it)
+        }
     }
-    private val adapterHistory = TrackAdapter() {
-        addInHistory(it)
-        saveTrackForAudioPlayer(it)
-        startAudioPlayer()
+    private val adapterHistory = TrackAdapter {
+        if (clickDebounce()) {
+            addInHistory(it)
+            startAudioPlayer(it)
+        }
     }
 
     private lateinit var binding: ActivitySearchBinding
     private var searchRequest: Editable? = null
+    private var inputMethodManager: InputMethodManager? = null
+    private var isClickAllowed = true
+
+    private val mainThreadHandler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable {
+        inputMethodManager?.hideSoftInputFromWindow(binding.inputEditText.windowToken, 0)
+        search(searchRequest)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +72,7 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val inputMethodManager =
+        inputMethodManager =
             getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
 
         adapter.tracks = tracks
@@ -89,11 +102,7 @@ class SearchActivity : AppCompatActivity() {
         binding.clearIcon.setOnClickListener {
             binding.inputEditText.setText("")
             inputMethodManager?.hideSoftInputFromWindow(binding.inputEditText.windowToken, 0)
-            tracks.clear()
-            adapter.notifyDataSetChanged()
-            binding.placeholderMessage.isVisible = false
-            binding.placeholderImage.isVisible = false
-            binding.refreshButton.isVisible = false
+            hideAllExceptHistory()
         }
 
         val simpleTextWatcher = object : TextWatcher {
@@ -114,8 +123,13 @@ class SearchActivity : AppCompatActivity() {
             ) {
                 binding.clearIcon.isVisible = clearButtonVisibility(textSearch)
                 text = textSearch.toString()
-                binding.historyOfSearch.isVisible =
-                    binding.inputEditText.hasFocus() && textSearch?.isEmpty() == true && tracksInHistory.size > 0
+                if (binding.inputEditText.hasFocus() && textSearch?.isEmpty() == true && tracksInHistory.size > 0) {
+                    hideAllExceptHistory()
+                    binding.historyOfSearch.isVisible = true
+                } else {
+                    binding.historyOfSearch.isVisible = false
+                }
+                searchDebounce()
             }
 
             override fun afterTextChanged(textSearch: Editable?) {
@@ -177,15 +191,19 @@ class SearchActivity : AppCompatActivity() {
     private fun search(searchRequest: Editable?) {
         if (searchRequest?.isNotEmpty() == true) {
             binding.refreshButton.isVisible = false
+            binding.recyclerView.isVisible = false
+            binding.progressBar.isVisible = true
             iTunesService.search(searchRequest.toString()).enqueue(object :
                 Callback<ITunesResponse> {
                 override fun onResponse(
                     call: Call<ITunesResponse>,
                     response: Response<ITunesResponse>
                 ) {
+                    binding.progressBar.isVisible = false
                     if (response.code() == EXECUTED_REQUEST) {
                         tracks.clear()
                         if (response.body()?.results?.isNotEmpty() == true) {
+                            binding.recyclerView.isVisible = true
                             tracks.addAll(response.body()?.results!!)
                             adapter.notifyDataSetChanged()
                         }
@@ -201,6 +219,7 @@ class SearchActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<ITunesResponse>, t: Throwable) {
+                    binding.progressBar.isVisible = false
                     showMessage(getString(R.string.something_went_wrong), R.drawable.disconnect)
                     binding.refreshButton.isVisible = true
                 }
@@ -214,16 +233,34 @@ class SearchActivity : AppCompatActivity() {
         adapterHistory.notifyDataSetChanged()
     }
 
-    private fun startAudioPlayer() {
-        val audioPlayerIntent = Intent(this, AudioPlayerActivity::class.java)
+    private fun startAudioPlayer(track: Track) {
+        val audioPlayerIntent = Intent(this, AudioPlayerActivity::class.java).apply {
+            putExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, track)
+        }
         startActivity(audioPlayerIntent)
     }
 
-    private fun saveTrackForAudioPlayer(track: Track) {
-        val sharedPrefs = getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE)
-        sharedPrefs.edit()
-            .putString(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, Gson().toJson(track))
-            .apply()
+    private fun hideAllExceptHistory() {
+        tracks.clear()
+        adapter.notifyDataSetChanged()
+        binding.placeholderMessage.isVisible = false
+        binding.placeholderImage.isVisible = false
+        binding.refreshButton.isVisible = false
+    }
+
+    private fun searchDebounce() {
+        searchRequest = binding.inputEditText.text
+        mainThreadHandler.removeCallbacks(searchRunnable)
+        mainThreadHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            mainThreadHandler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
     }
 
 }

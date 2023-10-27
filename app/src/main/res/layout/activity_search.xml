@@ -80,6 +80,15 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             />
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="@dimen/eleven_space"
+            android:layout_height="@dimen/eleven_space"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/blue"
+            android:visibility="gone"/>
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
