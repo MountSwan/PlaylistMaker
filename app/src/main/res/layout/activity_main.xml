@@ -5,7 +5,7 @@
     style="@style/StandardScreen"
     android:padding="@dimen/four_space"
     android:background="@color/background_activity_main"
-    tools:context=".MainActivity">
+    tools:context=".presentation.MainActivity">
 
     <TextView
         android:layout_width="wrap_content"

@@ -1,8 +1,10 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.data
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import com.practicum.playlistmaker.SearchActivity.Companion.MAX_NUMBER_TRACKS_IN_SEARCH_HISTORY
+import com.practicum.playlistmaker.HISTORY_SEARCH_KEY
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.presentation.search.SearchActivity.Companion.MAX_NUMBER_TRACKS_IN_SEARCH_HISTORY
 
 class SearchHistory(private val sharedPrefs: SharedPreferences) {
 
