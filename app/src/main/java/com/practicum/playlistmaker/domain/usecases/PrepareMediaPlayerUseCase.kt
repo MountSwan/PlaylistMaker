@@ -1,9 +1,9 @@
 package com.practicum.playlistmaker.domain.usecases
 
-import com.practicum.playlistmaker.domain.PrepareMediaPlayer
+import com.practicum.playlistmaker.domain.AudioPlayer
 
-class PrepareMediaPlayerUseCase(private val prepareMediaPlayer: PrepareMediaPlayer) {
-    fun execute() {
-        prepareMediaPlayer.preparePlayer()
+class PrepareMediaPlayerUseCase(private val audioPlayer: AudioPlayer) {
+    fun execute(urlForPlaying: String?) {
+        audioPlayer.preparePlayer(urlForPlaying)
     }
 }

@@ -1,9 +1,9 @@
 package com.practicum.playlistmaker.domain.usecases
 
-import com.practicum.playlistmaker.domain.PauseMediaPlayer
+import com.practicum.playlistmaker.domain.AudioPlayer
 
-class PauseMediaPlayerUseCase(private val pauseMediaPlayer: PauseMediaPlayer) {
+class PauseMediaPlayerUseCase(private val audioPlayer: AudioPlayer) {
     fun execute() {
-        pauseMediaPlayer.execute()
+        audioPlayer.pausePlayer()
     }
 }

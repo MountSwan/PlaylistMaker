@@ -8,39 +8,35 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.practicum.playlistmaker.Creator
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
-import com.practicum.playlistmaker.data.MediaPlayerFromData
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.domain.models.MediaPlayerState
 import com.practicum.playlistmaker.domain.models.Track
-import com.practicum.playlistmaker.domain.usecases.CreateUpdateTimerTaskUseCase
 import com.practicum.playlistmaker.domain.usecases.PauseMediaPlayerUseCase
-import com.practicum.playlistmaker.domain.usecases.PlaybackControlUseCase
 import com.practicum.playlistmaker.domain.usecases.PrepareMediaPlayerUseCase
 import com.practicum.playlistmaker.domain.usecases.ReleaseMediaPlayerUseCase
-import com.practicum.playlistmaker.data.mediaplayer.CreateUpdateTimerTaskImpl
-import com.practicum.playlistmaker.data.mediaplayer.PauseMediaPlayerImpl
-import com.practicum.playlistmaker.domain.usecases.EnableIVControlPlayUseCase
-import com.practicum.playlistmaker.domain.usecases.SetTVTimePlayTrackTextUseCase
-import com.practicum.playlistmaker.presentation.mediaplayer.EnableIVControlPlayImpl
-import com.practicum.playlistmaker.data.mediaplayer.PrepareMediaPlayerImpl
-import com.practicum.playlistmaker.data.mediaplayer.ReleaseMediaPlayerImpl
-import com.practicum.playlistmaker.presentation.mediaplayer.SetIVControlPlayImpl
-import com.practicum.playlistmaker.presentation.mediaplayer.SetTVTimePlayTrackTextImpl
-import com.practicum.playlistmaker.data.mediaplayer.StartMediaPlayerImpl
-import com.practicum.playlistmaker.domain.models.Parameters
+import com.practicum.playlistmaker.domain.usecases.StartMediaPlayerUseCase
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    private val mediaPlayerFromData = MediaPlayerFromData()
-    var mediaPlayer = mediaPlayerFromData.getMediaPlayer
-
-    lateinit var parameters: Parameters
-
     private val mediaPlayerState = MediaPlayerState()
-
     private val mainThreadHandler = Handler(Looper.getMainLooper())
+
+    private val timerRunnable = createUpdateTimerTask()
+
+    private val audioPlayer =
+        Creator.provideAudioPlayer(
+            mediaPlayerState,
+            mainThreadHandler,
+            timerRunnable
+        )
+
+    private val pausePlayer = PauseMediaPlayerUseCase(audioPlayer)
+    private val startPlayer = StartMediaPlayerUseCase(audioPlayer)
 
     private lateinit var binding: ActivityAudioplayerBinding
 
@@ -74,87 +70,64 @@ class AudioPlayerActivity : AppCompatActivity() {
         binding.genre.text = savedTrack?.primaryGenreName
         binding.country.text = savedTrack?.country
 
-        val setTVTimePlayTrackText = SetTVTimePlayTrackTextUseCase(
-            SetTVTimePlayTrackTextImpl(
-                tvTimePlayTrack = binding.timePlayTrack
-            )
+
+        var mediaPlayerListener = MediaPlayerListenerImpl(
+            audioPlayer, binding.controlPlay, binding.timePlayTrack,
+            mediaPlayerState
         )
 
-        val enableIVControlPlay = EnableIVControlPlayUseCase(
-            EnableIVControlPlayImpl(
-                ivControlPlay = binding.controlPlay
-            )
-        )
-
-        val timerRunnable = CreateUpdateTimerTaskUseCase(
-            CreateUpdateTimerTaskImpl(
-                setTVTimePlayTrackText = setTVTimePlayTrackText,
-                mediaPlayer = mediaPlayer,
-                mainThreadHandler = mainThreadHandler
-            )
-        ).execute()
-
-        parameters = Parameters(
-            urlForPlaying = savedTrack?.previewUrl,
-            mediaPlayerState = mediaPlayerState,
-            setTVTimePlayTrackText = setTVTimePlayTrackText,
-            enableIVControlPlay = enableIVControlPlay,
-            setIVControlPlay = SetIVControlPlayImpl(ivControlPlay = binding.controlPlay),
-            imageCodePlayForIVControlPlay = R.drawable.control_play,
-            imageCodePauseForIVControlPlay = R.drawable.control_pause,
-            mainThreadHandler = mainThreadHandler,
-            timerRunnable = timerRunnable
-        )
-
-        val prepareMediaPlayer =
-            PrepareMediaPlayerUseCase(
-                PrepareMediaPlayerImpl(
-                    mediaPlayer = mediaPlayer,
-                    params = parameters
-                )
-            )
-        prepareMediaPlayer.execute()
+        val prepareMediaPlayer = PrepareMediaPlayerUseCase(audioPlayer)
+        prepareMediaPlayer.execute(savedTrack?.previewUrl)
 
         binding.controlPlay.setOnClickListener {
-            val playbackControl = PlaybackControlUseCase(
-                PauseMediaPlayerImpl(
-                    mediaPlayer = mediaPlayer,
-                    params = parameters
-                ), StartMediaPlayerImpl(
-                    mediaPlayer = mediaPlayer,
-                    params = parameters
-                )
-            )
-            playbackControl.execute(mediaPlayerState = mediaPlayerState)
+            playbackControl()
         }
 
     }
 
     override fun onPause() {
         super.onPause()
-        val pausePlayer = PauseMediaPlayerUseCase(
-            PauseMediaPlayerImpl(
-                mediaPlayer = mediaPlayer,
-                params = parameters
-            )
-        )
         pausePlayer.execute()
+        binding.controlPlay.setImageResource(R.drawable.control_play)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        val releaseMediaPlayer = ReleaseMediaPlayerUseCase(
-            ReleaseMediaPlayerImpl(
-                mediaPlayer = mediaPlayer,
-                params = parameters
-            )
-        )
+        val releaseMediaPlayer = ReleaseMediaPlayerUseCase(audioPlayer)
         releaseMediaPlayer.execute()
     }
 
+    private fun createUpdateTimerTask(): Runnable {
+        return object : Runnable {
+            override fun run() {
+                val elapsedTime = System.currentTimeMillis() - mediaPlayerState.startTime
+                binding.timePlayTrack.text =
+                    SimpleDateFormat(
+                        "mm:ss",
+                        Locale.getDefault()
+                    ).format(elapsedTime)
+                mainThreadHandler.postDelayed(this, REFRESH_TIMER_MILLIS)
+            }
+        }
+    }
+
+    private fun playbackControl() {
+        when (mediaPlayerState.playerState) {
+            "STATE_PLAYING" -> {
+                pausePlayer.execute()
+                binding.controlPlay.setImageResource(R.drawable.control_play)
+            }
+
+            "STATE_PREPARED", "STATE_PAUSED" -> {
+                startPlayer.execute()
+                binding.controlPlay.setImageResource(R.drawable.control_pause)
+            }
+        }
+    }
 
     companion object {
         const val FIRST_FOUR_CHARACTERS = 4
+        const val REFRESH_TIMER_MILLIS = 500L
     }
 
 }
