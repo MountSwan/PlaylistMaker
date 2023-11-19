@@ -14,6 +14,8 @@ import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.domain.models.MediaPlayerState
 import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.domain.usecases.GetMediaPlayerCurrentPositionUseCase
+import com.practicum.playlistmaker.domain.usecases.GetMediaPlayerStateUseCase
 import com.practicum.playlistmaker.domain.usecases.PauseMediaPlayerUseCase
 import com.practicum.playlistmaker.domain.usecases.PrepareMediaPlayerUseCase
 import com.practicum.playlistmaker.domain.usecases.ReleaseMediaPlayerUseCase
@@ -23,20 +25,18 @@ import java.util.Locale
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    private val mediaPlayerState = MediaPlayerState()
-    private val mainThreadHandler = Handler(Looper.getMainLooper())
+    private val audioPlayer =
+        Creator.provideAudioPlayer()
 
+    private val mainThreadHandler = Handler(Looper.getMainLooper())
     private val timerRunnable = createUpdateTimerTask()
 
-    private val audioPlayer =
-        Creator.provideAudioPlayer(
-            mediaPlayerState,
-            mainThreadHandler,
-            timerRunnable
-        )
-
+    private val preparePlayer = PrepareMediaPlayerUseCase(audioPlayer)
     private val pausePlayer = PauseMediaPlayerUseCase(audioPlayer)
     private val startPlayer = StartMediaPlayerUseCase(audioPlayer)
+    private val releasePlayer = ReleaseMediaPlayerUseCase(audioPlayer)
+    private val getPlayerCurrentPosition = GetMediaPlayerCurrentPositionUseCase(audioPlayer)
+    private val getPlayerState = GetMediaPlayerStateUseCase(audioPlayer)
 
     private lateinit var binding: ActivityAudioplayerBinding
 
@@ -71,13 +71,15 @@ class AudioPlayerActivity : AppCompatActivity() {
         binding.country.text = savedTrack?.country
 
 
-        var mediaPlayerListener = MediaPlayerListenerImpl(
-            audioPlayer, binding.controlPlay, binding.timePlayTrack,
-            mediaPlayerState
+        audioPlayer.addListener(
+            MediaPlayerListenerImpl(
+                audioPlayer, binding.controlPlay, binding.timePlayTrack,
+                mainThreadHandler,
+                timerRunnable
+            )
         )
 
-        val prepareMediaPlayer = PrepareMediaPlayerUseCase(audioPlayer)
-        prepareMediaPlayer.execute(savedTrack?.previewUrl)
+        preparePlayer.execute(savedTrack?.previewUrl)
 
         binding.controlPlay.setOnClickListener {
             playbackControl()
@@ -87,42 +89,52 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        pausePlayer.execute()
-        binding.controlPlay.setImageResource(R.drawable.control_play)
+        pausePlayer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        val releaseMediaPlayer = ReleaseMediaPlayerUseCase(audioPlayer)
-        releaseMediaPlayer.execute()
+        mainThreadHandler.removeCallbacks(timerRunnable)
+        releasePlayer.execute()
     }
 
     private fun createUpdateTimerTask(): Runnable {
         return object : Runnable {
             override fun run() {
-                val elapsedTime = System.currentTimeMillis() - mediaPlayerState.startTime
                 binding.timePlayTrack.text =
                     SimpleDateFormat(
                         "mm:ss",
                         Locale.getDefault()
-                    ).format(elapsedTime)
+                    ).format(getPlayerCurrentPosition.execute())
                 mainThreadHandler.postDelayed(this, REFRESH_TIMER_MILLIS)
             }
         }
     }
 
     private fun playbackControl() {
-        when (mediaPlayerState.playerState) {
-            "STATE_PLAYING" -> {
-                pausePlayer.execute()
-                binding.controlPlay.setImageResource(R.drawable.control_play)
+        when (getPlayerState.execute()) {
+            is MediaPlayerState.Playing -> {
+                pausePlayer()
             }
 
-            "STATE_PREPARED", "STATE_PAUSED" -> {
-                startPlayer.execute()
-                binding.controlPlay.setImageResource(R.drawable.control_pause)
+            is MediaPlayerState.Prepared, MediaPlayerState.Paused -> {
+                startPlayer()
             }
+
+            is MediaPlayerState.Default -> {}
         }
+    }
+
+    private fun startPlayer() {
+        startPlayer.execute()
+        binding.controlPlay.setImageResource(R.drawable.control_pause)
+        mainThreadHandler.post(timerRunnable)
+    }
+
+    private fun pausePlayer() {
+        pausePlayer.execute()
+        binding.controlPlay.setImageResource(R.drawable.control_play)
+        mainThreadHandler.removeCallbacks(timerRunnable)
     }
 
     companion object {

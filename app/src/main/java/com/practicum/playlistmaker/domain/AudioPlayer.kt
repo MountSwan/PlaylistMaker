@@ -1,5 +1,7 @@
 package com.practicum.playlistmaker.domain
 
+import com.practicum.playlistmaker.domain.models.MediaPlayerState
+
 
 interface AudioPlayer {
 
@@ -10,6 +12,10 @@ interface AudioPlayer {
     fun pausePlayer()
 
     fun releasePlayer()
+
+    fun playerCurrentPosition(): Int
+
+    fun playerState(): MediaPlayerState
 
     fun addListener(listener: MediaPlayerListener)
 

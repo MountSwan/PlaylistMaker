@@ -1,15 +1,18 @@
 package com.practicum.playlistmaker.presentation
 
+import android.os.Handler
 import android.widget.ImageView
 import android.widget.TextView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.AudioPlayer
 import com.practicum.playlistmaker.domain.MediaPlayerListener
-import com.practicum.playlistmaker.domain.models.MediaPlayerState
 
 class MediaPlayerListenerImpl(
-    private val audioPlayer: AudioPlayer, private val controlPlay: ImageView,
-    private val timePlayTrack: TextView, private val mediaPlayerState: MediaPlayerState
+    audioPlayer: AudioPlayer,
+    private val controlPlay: ImageView,
+    private val timePlayTrack: TextView,
+    private val mainThreadHandler: Handler,
+    private val timerRunnable: Runnable
 ) :
     MediaPlayerListener {
 
@@ -18,8 +21,8 @@ class MediaPlayerListenerImpl(
     }
 
     override fun onCompletionMediaPlayer() {
+        mainThreadHandler.removeCallbacks(timerRunnable)
         controlPlay.setImageResource(R.drawable.control_play)
-        mediaPlayerState.startTime = 0L
         timePlayTrack.text = "00:00"
     }
 
