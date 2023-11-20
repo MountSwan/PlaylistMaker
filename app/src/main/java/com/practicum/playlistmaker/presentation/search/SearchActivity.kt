@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation.search
 
 import android.content.Context
 import android.content.Intent
@@ -12,7 +12,15 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.practicum.playlistmaker.data.network.ITunesApi
+import com.practicum.playlistmaker.data.dto.ITunesResponse
+import com.practicum.playlistmaker.PRACTICUM_EXAMPLE_PREFERENCES
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
+import com.practicum.playlistmaker.data.SearchHistory
+import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
+import com.practicum.playlistmaker.presentation.AudioPlayerActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -140,6 +148,7 @@ class SearchActivity : AppCompatActivity() {
 
         binding.inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
+                mainThreadHandler.removeCallbacks(searchRunnable)
                 searchRequest = binding.inputEditText.text
                 search(searchRequest)
 
