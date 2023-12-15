@@ -5,7 +5,7 @@
     style="@style/StandardScreen"
     android:padding="@dimen/four_space"
     android:background="@color/background_activity_main"
-    tools:context=".presentation.MainActivity">
+    tools:context=".main.ui.MainActivity">
 
     <TextView
         android:layout_width="wrap_content"
@@ -17,21 +17,21 @@
         android:textSize="@dimen/twenty_two_size_text" />
 
     <Button
-        android:id="@+id/search_button"
+        android:id="@+id/searchButton"
         style="@style/ButtonActivityMain"
         android:layout_marginTop="@dimen/six_space"
         android:text="@string/main_button_1"
         app:icon="@drawable/search" />
 
     <Button
-        android:id="@+id/media_library_button"
+        android:id="@+id/mediaLibraryButton"
         style="@style/ButtonActivityMain"
         android:layout_marginTop="@dimen/four_space"
         app:icon="@drawable/library"
         android:text="@string/main_button_2" />
 
     <Button
-        android:id="@+id/settings_button"
+        android:id="@+id/settingsButton"
         style="@style/ButtonActivityMain"
         android:layout_marginTop="@dimen/four_space"
         app:icon="@drawable/settings"

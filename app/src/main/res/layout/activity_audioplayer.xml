@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.AudioPlayerActivity">
+    tools:context=".player.ui.AudioPlayerActivity">
 
     <ImageView
         android:id="@+id/arrowBackImage"
@@ -86,7 +86,7 @@
         app:layout_constraintTop_toBottomOf="@id/artistName"
         app:layout_constraintTop_toTopOf="@id/controlPlay"
         app:layout_constraintBottom_toBottomOf="@id/controlPlay"
-        app:srcCompat="@drawable/add_to_playlist" />
+        android:src="@drawable/add_to_playlist" />
 
     <ImageView
         android:id="@+id/addToFavorites"
@@ -96,7 +96,7 @@
         app:layout_constraintTop_toBottomOf="@id/artistName"
         app:layout_constraintTop_toTopOf="@id/controlPlay"
         app:layout_constraintBottom_toBottomOf="@id/controlPlay"
-        app:srcCompat="@drawable/add_to_favorites" />
+        android:src="@drawable/add_to_favorites" />
 
     <ImageView
         android:id="@+id/controlPlay"
@@ -106,7 +106,7 @@
         app:layout_constraintEnd_toStartOf="@id/rightBorder"
         app:layout_constraintBottom_toTopOf="@id/timePlayTrack"
         android:layout_marginBottom="@dimen/one_space"
-        app:srcCompat="@drawable/control_play" />
+        android:src="@drawable/control_play" />
 
     <TextView
         android:id="@+id/timePlayTrack"
