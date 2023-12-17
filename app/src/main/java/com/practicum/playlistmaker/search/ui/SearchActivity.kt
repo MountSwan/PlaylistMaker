@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.search.ui
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -12,8 +13,11 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
+import com.practicum.playlistmaker.player.ui.AudioPlayerActivity
+import com.practicum.playlistmaker.search.ui.models.TrackUi
 
 class SearchActivity : AppCompatActivity() {
 
@@ -24,7 +28,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private var text: String = ""
-    private lateinit var context: Context
 
     private val adapter = TrackAdapter {
         if (clickDebounce()) {
@@ -56,8 +59,6 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        context = this
 
         viewModel = ViewModelProvider(
             this,
@@ -132,7 +133,7 @@ class SearchActivity : AppCompatActivity() {
                 count: Int
             ) {
                 viewModel.doOnTextChange(textSearch)
-                viewModel.observeSearchState().observe(context as SearchActivity) {
+                viewModel.observeSearchState().observe(this@SearchActivity) {
                     binding.clearIcon.isVisible = it.clearButtonVisibility
                     if (binding.inputEditText.hasFocus() && textSearch?.isEmpty() == true && it.tracksInHistorySize > 0) {
                         hideAllExceptHistory()
@@ -204,7 +205,24 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun startAudioPlayer(track: Track) {
-        viewModel.startAudioPlayer(track)
+        val trackUi = TrackUi(
+            trackId = track.trackId,
+            trackName = track.trackName,
+            artistName = track.artistName,
+            trackTimeMillis = track.trackTimeMillis,
+            trackTime = track.trackTime,
+            artworkUrl100 = track.artworkUrl100,
+            artworkUrl512 = track.artworkUrl512,
+            collectionName = track.collectionName,
+            releaseDate = track.releaseDate,
+            primaryGenreName = track.primaryGenreName,
+            country = track.country,
+            previewUrl = track.previewUrl
+        )
+        val audioPlayerIntent = Intent(this, AudioPlayerActivity::class.java).apply {
+            putExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, trackUi)
+        }
+        startActivity(audioPlayerIntent)
     }
 
     private fun hideAllExceptHistory() {

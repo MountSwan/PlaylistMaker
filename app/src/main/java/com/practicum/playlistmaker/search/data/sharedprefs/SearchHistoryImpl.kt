@@ -4,14 +4,14 @@ import android.content.Context
 import com.google.gson.Gson
 import com.practicum.playlistmaker.HISTORY_SEARCH_KEY
 import com.practicum.playlistmaker.PRACTICUM_EXAMPLE_PREFERENCES
-import com.practicum.playlistmaker.search.domain.SearchHistory
+import com.practicum.playlistmaker.search.data.SearchHistory
 import com.practicum.playlistmaker.search.domain.models.Track
 
 class SearchHistoryImpl(context: Context) : SearchHistory {
 
-    companion object {
-        const val MAX_NUMBER_TRACKS_IN_SEARCH_HISTORY = 10
-    }
+
+    private val maxNumberTracksInSearchHistory = 10
+
 
     private val sharedPrefs = context.getSharedPreferences(
         PRACTICUM_EXAMPLE_PREFERENCES,
@@ -47,7 +47,7 @@ class SearchHistoryImpl(context: Context) : SearchHistory {
 
         tracksInHistory.removeIf { it.trackId == track.trackId }
 
-        if (tracksInHistory.size == MAX_NUMBER_TRACKS_IN_SEARCH_HISTORY) {
+        if (tracksInHistory.size == maxNumberTracksInSearchHistory) {
             tracksInHistory.removeLast()
         }
 

@@ -1,17 +1,14 @@
 package com.practicum.playlistmaker.creator
 
 import android.content.Context
-import android.content.Intent
 import com.practicum.playlistmaker.player.data.AudioPlayerImpl
-import com.practicum.playlistmaker.player.data.GetSavedTrackImpl
 import com.practicum.playlistmaker.player.domain.AudioPlayer
-import com.practicum.playlistmaker.player.domain.GetSavedTrack
-import com.practicum.playlistmaker.search.data.StartAudioPlayerImpl
 import com.practicum.playlistmaker.search.data.network.NetworkClientImpl
 import com.practicum.playlistmaker.search.data.sharedprefs.SearchHistoryImpl
-import com.practicum.playlistmaker.search.domain.NetworkClient
-import com.practicum.playlistmaker.search.domain.SearchHistory
-import com.practicum.playlistmaker.search.domain.StartAudioPlayer
+import com.practicum.playlistmaker.search.data.network.TracksRepositoryImpl
+import com.practicum.playlistmaker.search.data.sharedprefs.SearchHistoryRepositoryImpl
+import com.practicum.playlistmaker.search.domain.SearchHistoryRepository
+import com.practicum.playlistmaker.search.domain.TracksRepository
 import com.practicum.playlistmaker.settings.data.ExternalNavigatorImpl
 import com.practicum.playlistmaker.settings.data.sharedprefs.ThemeSwitcherStateImpl
 import com.practicum.playlistmaker.settings.domain.ExternalNavigator
@@ -23,12 +20,12 @@ object Creator {
         return AudioPlayerImpl()
     }
 
-    fun provideNetworkClient(): NetworkClient {
-        return NetworkClientImpl()
+    fun provideTracksRepository(): TracksRepository {
+        return TracksRepositoryImpl(NetworkClientImpl())
     }
 
-    fun provideSearchHistory(context: Context): SearchHistory {
-        return SearchHistoryImpl(context)
+    fun provideSearchHistoryRepository(context: Context): SearchHistoryRepository {
+        return SearchHistoryRepositoryImpl(SearchHistoryImpl(context))
     }
 
     fun provideThemeSwitcherState(context: Context): ThemeSwitcherState {
@@ -37,14 +34,6 @@ object Creator {
 
     fun provideExternalNavigator(context: Context): ExternalNavigator {
         return ExternalNavigatorImpl(context)
-    }
-
-    fun provideStartAudioPlayer(context: Context, audioPlayerIntent: Intent): StartAudioPlayer {
-        return StartAudioPlayerImpl(context, audioPlayerIntent)
-    }
-
-    fun provideGetSavedTrack(intent: Intent): GetSavedTrack {
-        return GetSavedTrackImpl(intent)
     }
 
 }

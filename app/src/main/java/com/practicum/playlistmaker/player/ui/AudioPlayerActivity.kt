@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    private val mainThreadHandler = Handler(Looper.getMainLooper())
+    //private val mainThreadHandler = Handler(Looper.getMainLooper())
 
     private lateinit var viewModel: AudioPlayerViewModel
 
@@ -30,7 +30,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
 
         viewModel =
-            ViewModelProvider(this, AudioPlayerViewModelFactory(mainThreadHandler, intent)).get(
+            ViewModelProvider(this, AudioPlayerViewModelFactory(intent)).get(
                 AudioPlayerViewModel::class.java
             )
 

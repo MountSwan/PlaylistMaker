@@ -1,9 +1,13 @@
 package com.practicum.playlistmaker.main.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.practicum.playlistmaker.LibraryActivity
 import com.practicum.playlistmaker.databinding.ActivityMainBinding
+import com.practicum.playlistmaker.search.ui.SearchActivity
+import com.practicum.playlistmaker.settings.ui.SettingsActivity
 
 
 class MainActivity : AppCompatActivity() {
@@ -18,26 +22,24 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         viewModel =
-            ViewModelProvider(this, MainActivityViewModelFactory(applicationContext)).get(
+            ViewModelProvider(this, MainActivityViewModelFactory()).get(
                 MainActivityViewModel::class.java
             )
 
-        viewModel.observeIntent().observe(this) {
-            if (it != null) {
-                startActivity(it)
-            }
-        }
 
         binding.searchButton.setOnClickListener {
-            viewModel.onClickSearchButton()
+            val searchIntent = Intent(this, SearchActivity::class.java)
+            startActivity(searchIntent)
         }
 
         binding.mediaLibraryButton.setOnClickListener {
-            viewModel.onClickMediaLibraryButton()
+            val libraryIntent = Intent(this, LibraryActivity::class.java)
+            startActivity(libraryIntent)
         }
 
         binding.settingsButton.setOnClickListener {
-            viewModel.onClickSettingsButton()
+            val settingsIntent = Intent(this, SettingsActivity::class.java)
+            startActivity(settingsIntent)
         }
 
     }

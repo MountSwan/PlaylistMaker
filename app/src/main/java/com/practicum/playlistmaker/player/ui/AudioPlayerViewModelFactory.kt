@@ -1,19 +1,22 @@
 package com.practicum.playlistmaker.player.ui
 
 import android.content.Intent
+import android.os.Build
 import android.os.Handler
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
 import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.player.domain.usecases.GetMediaPlayerCurrentPositionUseCase
 import com.practicum.playlistmaker.player.domain.usecases.GetMediaPlayerStateUseCase
-import com.practicum.playlistmaker.player.domain.usecases.GetSavedTrackUseCase
 import com.practicum.playlistmaker.player.domain.usecases.PauseMediaPlayerUseCase
 import com.practicum.playlistmaker.player.domain.usecases.PrepareMediaPlayerUseCase
 import com.practicum.playlistmaker.player.domain.usecases.ReleaseMediaPlayerUseCase
 import com.practicum.playlistmaker.player.domain.usecases.StartMediaPlayerUseCase
+import com.practicum.playlistmaker.search.domain.models.Track
+import com.practicum.playlistmaker.search.ui.models.TrackUi
 
-class AudioPlayerViewModelFactory(private val mainThreadHandler: Handler, intent: Intent) :
+class AudioPlayerViewModelFactory(intent: Intent) :
     ViewModelProvider.Factory {
 
     private val audioPlayer = Creator.provideAudioPlayer()
@@ -23,13 +26,31 @@ class AudioPlayerViewModelFactory(private val mainThreadHandler: Handler, intent
     private val releasePlayer = ReleaseMediaPlayerUseCase(audioPlayer)
     private val getPlayerCurrentPosition = GetMediaPlayerCurrentPositionUseCase(audioPlayer)
     private val getPlayerState = GetMediaPlayerStateUseCase(audioPlayer)
-    private val getSavedTrack = Creator.provideGetSavedTrack(intent)
-    private val getSavedTrackUseCase = GetSavedTrackUseCase(getSavedTrack)
-    private val savedTrack = getSavedTrackUseCase.execute()
+
+    private val savedTrackUi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        intent.getParcelableExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, TrackUi::class.java)
+    } else {
+        intent.getParcelableExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY)
+    }
+    private val savedTrack = savedTrackUi?.let {
+        Track(
+            trackId = it.trackId,
+            trackName = it.trackName,
+            artistName = it.artistName,
+            trackTimeMillis = it.trackTimeMillis,
+            trackTime = it.trackTime,
+            artworkUrl100 = it.artworkUrl100,
+            artworkUrl512 = it.artworkUrl512,
+            collectionName = it.collectionName,
+            releaseDate = it.releaseDate,
+            primaryGenreName = it.primaryGenreName,
+            country = it.country,
+            previewUrl = it.previewUrl
+        )
+    }
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return AudioPlayerViewModel(
-            mainThreadHandler = mainThreadHandler,
             savedTrack = savedTrack,
             preparePlayer = preparePlayer,
             pausePlayer = pausePlayer,

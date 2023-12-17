@@ -1,6 +1,11 @@
 package com.practicum.playlistmaker.search.data.network
 
-import com.practicum.playlistmaker.search.domain.NetworkClient
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.util.Log
+import com.practicum.playlistmaker.search.data.NetworkClient
+import com.practicum.playlistmaker.search.data.models.TrackDto
 import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 import com.practicum.playlistmaker.search.domain.models.SearchState
 import com.practicum.playlistmaker.search.domain.models.Track
@@ -15,6 +20,8 @@ class NetworkClientImpl : NetworkClient {
     companion object {
         const val EXECUTED_REQUEST = 200
     }
+
+    val tracksResponse = ArrayList<TrackDto>()
 
     private var networkRequestState: NetworkRequestState = NetworkRequestState.Default
 
@@ -33,6 +40,7 @@ class NetworkClientImpl : NetworkClient {
         tracks: ArrayList<Track>
     ) {
         networkRequestState = NetworkRequestState.Default
+
         iTunesService.search(searchRequest).enqueue(object :
             Callback<ITunesResponse> {
             override fun onResponse(
@@ -42,6 +50,7 @@ class NetworkClientImpl : NetworkClient {
                 if (response.code() == EXECUTED_REQUEST) {
                     tracks.clear()
                     networkRequestState = NetworkRequestState.OnResponse.ExecutedRequest
+                    Log.e("AAA", "EXECUTED_REQUEST")
                     if (response.body()?.results?.isNotEmpty() == true) {
                         tracks.addAll(response.body()?.results!!.map {
                             Track(
@@ -62,6 +71,7 @@ class NetworkClientImpl : NetworkClient {
 
                         searchState.responseResultsIsNotEmpty = true
                     }
+                    tracksResponse.addAll(response.body()?.results!!)
                 } else {
                     networkRequestState = NetworkRequestState.OnResponse.IsNotExecutedRequest
                 }
@@ -78,6 +88,5 @@ class NetworkClientImpl : NetworkClient {
     override fun networkRequestState(): NetworkRequestState {
         return networkRequestState
     }
-
 
 }

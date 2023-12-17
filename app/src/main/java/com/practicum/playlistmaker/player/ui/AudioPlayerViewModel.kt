@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.player.ui
 
 import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,7 +17,6 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class AudioPlayerViewModel(
-    private val mainThreadHandler: Handler,
     private val savedTrack: Track?,
     private val preparePlayer: PrepareMediaPlayerUseCase,
     private val pausePlayer: PauseMediaPlayerUseCase,
@@ -27,12 +27,16 @@ class AudioPlayerViewModel(
 ) :
     ViewModel() {
 
+    val mainThreadHandler: Handler
+
     private val savedTrackLiveData =
         MutableLiveData<Track?>()
+
     fun observeSavedTrack(): LiveData<Track?> = savedTrackLiveData
 
     private val playerStateLiveData =
         MutableLiveData<MediaPlayerState>()
+
     fun observePlayerState(): LiveData<MediaPlayerState> = playerStateLiveData
 
     private val timePlayTrackLiveData = MutableLiveData<String>()
@@ -42,6 +46,7 @@ class AudioPlayerViewModel(
     private val listenerPlayerStateRunnable = listenerPlayerState()
 
     init {
+        mainThreadHandler = Handler(Looper.getMainLooper())
         savedTrackLiveData.value = savedTrack
         mainThreadHandler.post(listenerPlayerStateRunnable)
     }

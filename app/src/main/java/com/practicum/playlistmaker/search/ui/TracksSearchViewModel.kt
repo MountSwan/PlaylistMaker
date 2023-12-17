@@ -5,29 +5,24 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.search.domain.NetworkClient
-import com.practicum.playlistmaker.search.domain.SearchHistory
+import com.practicum.playlistmaker.search.domain.SearchHistoryRepository
+import com.practicum.playlistmaker.search.domain.TracksRepository
 import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 import com.practicum.playlistmaker.search.domain.models.SearchState
 import com.practicum.playlistmaker.search.domain.models.ShowMessage
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.domain.usecases.GetNetworkRequestStateUseCase
-import com.practicum.playlistmaker.search.domain.usecases.StartAudioPlayerUseCase
 
 class TracksSearchViewModel(
-    private val searchHistory: SearchHistory,
+    private val searchHistory: SearchHistoryRepository,
     private val nothingFoundMessage: String,
     private val somethingWentWrongMessage: String,
     private val mainThreadHandler: Handler,
-    private val networkClient: NetworkClient,
+    private val tracksRepository: TracksRepository,
     private val getNetworkRequestState: GetNetworkRequestStateUseCase,
-    private val startAudioPlayerUseCase: StartAudioPlayerUseCase,
 ) : ViewModel() {
 
-    companion object {
-        const val REFRESH_CHECKING_MILLIS = 500L
-    }
-
+    private val refreshCheckingMillis = 500L
 
     private val listenerNetworkClient = checkRequestCompletion()
 
@@ -87,7 +82,7 @@ class TracksSearchViewModel(
         searchState.progressBarIsVisible = true
         searchStateLiveData.value = searchState
 
-        networkClient.doRequest(
+        tracksRepository.searchTracks(
             searchRequest = searchRequest,
             searchState = searchState,
             tracks = tracks
@@ -111,11 +106,6 @@ class TracksSearchViewModel(
         searchHistory.addInHistory(track, tracksInHistory)
     }
 
-    fun startAudioPlayer(track: Track) {
-        startAudioPlayerUseCase.execute(track)
-
-    }
-
     private fun showMessage(text: String, image: Int) {
         showMessage.text = text
         showMessage.image = image
@@ -130,7 +120,7 @@ class TracksSearchViewModel(
                     searchState.requestIsComplete = false
                     executeRequestResult()
                 } else {
-                    mainThreadHandler.postDelayed(this, REFRESH_CHECKING_MILLIS)
+                    mainThreadHandler.postDelayed(this, refreshCheckingMillis)
                 }
             }
         }

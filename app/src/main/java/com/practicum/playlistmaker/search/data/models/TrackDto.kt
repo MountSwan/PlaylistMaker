@@ -1,11 +1,8 @@
 package com.practicum.playlistmaker.search.data.models
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-@Parcelize
 data class TrackDto(
     var trackId: Long,
     var trackName: String,
@@ -17,7 +14,7 @@ data class TrackDto(
     var primaryGenreName: String,
     var country: String,
     var previewUrl: String
-) : Parcelable {
+) {
 
     val artworkUrl512
         get() = if (artworkUrl100.isNotEmpty()) {

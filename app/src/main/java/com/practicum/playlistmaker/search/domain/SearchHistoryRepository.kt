@@ -2,7 +2,7 @@ package com.practicum.playlistmaker.search.domain
 
 import com.practicum.playlistmaker.search.domain.models.Track
 
-interface SearchHistory {
+interface SearchHistoryRepository {
 
     fun getTracksFromSharedPrefs(tracksInHistory: ArrayList<Track>)
 

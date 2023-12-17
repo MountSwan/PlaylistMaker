@@ -1,10 +1,10 @@
 package com.practicum.playlistmaker.search.domain.usecases
 
-import com.practicum.playlistmaker.search.domain.NetworkClient
+import com.practicum.playlistmaker.search.domain.TracksRepository
 import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 
-class GetNetworkRequestStateUseCase(private val networkClient: NetworkClient) {
+class GetNetworkRequestStateUseCase(private val tracksRepository: TracksRepository) {
     fun execute(): NetworkRequestState {
-        return networkClient.networkRequestState()
+        return tracksRepository.networkRequestState()
     }
 }
