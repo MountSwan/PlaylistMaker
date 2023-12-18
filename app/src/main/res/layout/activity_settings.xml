@@ -4,7 +4,7 @@
     style="@style/StandardScreen"
     android:padding="@dimen/four_space"
     android:background="@color/background_activity_settings"
-    tools:context=".presentation.SettingsActivity">
+    tools:context=".settings.ui.SettingsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,7 +12,7 @@
         android:layout_marginBottom="@dimen/six_space" >
 
         <ImageView
-            android:id="@+id/arrow_back_image"
+            android:id="@+id/ivArrowBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/arrow_back" />
@@ -32,7 +32,7 @@
         android:text="@string/setting1_dark_theme" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/themeSwitcher"
+        android:id="@+id/smThemeSwitcher"
         android:layout_gravity="end"
         android:layout_width="@dimen/fourteen_space"
         android:layout_height="@dimen/fourteen_space"/>
@@ -48,7 +48,7 @@
             android:text="@string/setting2_share_app" />
 
         <ImageView
-            android:id="@+id/share"
+            android:id="@+id/ivShare"
             style="@style/IconSettings"
             android:src="@drawable/share" />
 
@@ -63,7 +63,7 @@
             android:text="@string/setting3_support" />
 
         <ImageView
-            android:id="@+id/support"
+            android:id="@+id/ivSupport"
             style="@style/IconSettings"
             android:src="@drawable/support" />
 
@@ -78,7 +78,7 @@
             android:text="@string/setting4_user_agreement" />
 
         <ImageView
-            android:id="@+id/user_agreement"
+            android:id="@+id/ivUserAgreement"
             style="@style/IconSettings"
             android:src="@drawable/arrow_forward" />
 
