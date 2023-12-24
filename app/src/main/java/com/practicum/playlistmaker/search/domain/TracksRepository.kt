@@ -9,8 +9,6 @@ interface TracksRepository {
     fun searchTracks(
         searchRequest: String, searchState: SearchState,
         tracks: ArrayList<Track>
-    )
-
-    fun networkRequestState(): NetworkRequestState
+    ) : NetworkRequestState
 
 }

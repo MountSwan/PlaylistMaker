@@ -1,22 +1,15 @@
 package com.practicum.playlistmaker.search.data.sharedprefs
 
-import android.content.Context
+import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.practicum.playlistmaker.HISTORY_SEARCH_KEY
-import com.practicum.playlistmaker.PRACTICUM_EXAMPLE_PREFERENCES
 import com.practicum.playlistmaker.search.data.SearchHistory
 import com.practicum.playlistmaker.search.domain.models.Track
 
-class SearchHistoryImpl(context: Context) : SearchHistory {
-
+class SearchHistoryImpl(private val sharedPrefs: SharedPreferences, private val gson: Gson) :
+    SearchHistory {
 
     private val maxNumberTracksInSearchHistory = 10
-
-
-    private val sharedPrefs = context.getSharedPreferences(
-        PRACTICUM_EXAMPLE_PREFERENCES,
-        Context.MODE_PRIVATE
-    )
 
     override fun getTracksFromSharedPrefs(
         tracksInHistory: ArrayList<Track>
@@ -26,7 +19,7 @@ class SearchHistoryImpl(context: Context) : SearchHistory {
 
         if (historyInSharedPrefs != null) {
             val tracksFromSharedPrefs =
-                Gson().fromJson(historyInSharedPrefs, Array<Track>::class.java)
+                gson.fromJson(historyInSharedPrefs, Array<Track>::class.java)
             tracksInHistory.addAll(tracksFromSharedPrefs)
         }
 
@@ -36,7 +29,7 @@ class SearchHistoryImpl(context: Context) : SearchHistory {
         tracksInHistory: ArrayList<Track>
     ) {
         sharedPrefs.edit()
-            .putString(HISTORY_SEARCH_KEY, Gson().toJson(tracksInHistory))
+            .putString(HISTORY_SEARCH_KEY, gson.toJson(tracksInHistory))
             .apply()
     }
 

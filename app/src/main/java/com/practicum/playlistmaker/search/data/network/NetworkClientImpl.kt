@@ -3,90 +3,62 @@ package com.practicum.playlistmaker.search.data.network
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import com.practicum.playlistmaker.search.data.NetworkClient
 import com.practicum.playlistmaker.search.data.models.TrackDto
 import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 import com.practicum.playlistmaker.search.domain.models.SearchState
 import com.practicum.playlistmaker.search.domain.models.Track
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class NetworkClientImpl : NetworkClient {
-
-    companion object {
-        const val EXECUTED_REQUEST = 200
-    }
-
-    val tracksResponse = ArrayList<TrackDto>()
+class NetworkClientImpl(private val iTunesService: ITunesApi, private val context: Context) :
+    NetworkClient {
 
     private var networkRequestState: NetworkRequestState = NetworkRequestState.Default
-
-    private val iTunesBaseUrl = "https://itunes.apple.com"
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(iTunesBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val iTunesService = retrofit.create(ITunesApi::class.java)
 
     override fun doRequest(
         searchRequest: String,
         searchState: SearchState,
-        tracks: ArrayList<Track>
-    ) {
+        tracks: ArrayList<Track>,
+        tracksResponse: ArrayList<TrackDto>
+    ): NetworkRequestState {
         networkRequestState = NetworkRequestState.Default
+        tracksResponse.clear()
 
-        iTunesService.search(searchRequest).enqueue(object :
-            Callback<ITunesResponse> {
-            override fun onResponse(
-                call: Call<ITunesResponse>,
-                response: Response<ITunesResponse>
-            ) {
-                if (response.code() == EXECUTED_REQUEST) {
-                    tracks.clear()
-                    networkRequestState = NetworkRequestState.OnResponse.ExecutedRequest
-                    Log.e("AAA", "EXECUTED_REQUEST")
-                    if (response.body()?.results?.isNotEmpty() == true) {
-                        tracks.addAll(response.body()?.results!!.map {
-                            Track(
-                                trackId = it.trackId,
-                                trackName = it.trackName,
-                                artistName = it.artistName,
-                                trackTimeMillis = it.trackTimeMillis,
-                                trackTime = it.trackTime,
-                                artworkUrl100 = it.artworkUrl100,
-                                artworkUrl512 = it.artworkUrl512,
-                                collectionName = it.collectionName,
-                                releaseDate = it.releaseDate,
-                                primaryGenreName = it.primaryGenreName,
-                                country = it.country,
-                                previewUrl = it.previewUrl
-                            )
-                        })
+        if (isConnected() == false) {
+            networkRequestState = NetworkRequestState.OnFailure
+            return networkRequestState
+        }
 
-                        searchState.responseResultsIsNotEmpty = true
-                    }
-                    tracksResponse.addAll(response.body()?.results!!)
-                } else {
-                    networkRequestState = NetworkRequestState.OnResponse.IsNotExecutedRequest
-                }
-                searchState.requestIsComplete = true
-            }
+        val response = iTunesService.search(searchRequest).execute()
 
-            override fun onFailure(call: Call<ITunesResponse>, t: Throwable) {
-                networkRequestState = NetworkRequestState.OnFailure
-                searchState.requestIsComplete = true
-            }
-        })
+        if (response.code() == EXECUTED_REQUEST) {
+            tracks.clear()
+            networkRequestState = NetworkRequestState.OnResponse.ExecutedRequest
+            tracksResponse.addAll(response.body()?.results!!)
+            return networkRequestState
+        } else {
+            networkRequestState = NetworkRequestState.OnResponse.IsNotExecutedRequest
+            return networkRequestState
+        }
     }
 
-    override fun networkRequestState(): NetworkRequestState {
-        return networkRequestState
+    private fun isConnected(): Boolean {
+        val connectivityManager = context.getSystemService(
+            Context.CONNECTIVITY_SERVICE
+        ) as ConnectivityManager
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        if (capabilities != null) {
+            when {
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> return true
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> return true
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> return true
+            }
+        }
+        return false
+    }
+
+    companion object {
+        private const val EXECUTED_REQUEST = 200
     }
 
 }

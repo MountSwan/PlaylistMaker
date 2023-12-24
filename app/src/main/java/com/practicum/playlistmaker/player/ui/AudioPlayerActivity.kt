@@ -1,8 +1,6 @@
 package com.practicum.playlistmaker.player.ui
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
@@ -10,13 +8,11 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.domain.models.MediaPlayerState
-import androidx.lifecycle.ViewModelProvider
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    //private val mainThreadHandler = Handler(Looper.getMainLooper())
-
-    private lateinit var viewModel: AudioPlayerViewModel
+    private val viewModel by viewModel<AudioPlayerViewModel>()
 
     private lateinit var binding: ActivityAudioplayerBinding
 
@@ -29,10 +25,7 @@ class AudioPlayerActivity : AppCompatActivity() {
             finish()
         }
 
-        viewModel =
-            ViewModelProvider(this, AudioPlayerViewModelFactory(intent)).get(
-                AudioPlayerViewModel::class.java
-            )
+        viewModel.getSavedTrack(intent)
 
         viewModel.observeSavedTrack().observe(this) {
             Glide.with(applicationContext)

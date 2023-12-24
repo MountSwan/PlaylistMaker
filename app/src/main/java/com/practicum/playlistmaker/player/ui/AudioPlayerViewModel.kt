@@ -1,10 +1,13 @@
 package com.practicum.playlistmaker.player.ui
 
+import android.content.Intent
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
 import com.practicum.playlistmaker.player.domain.models.MediaPlayerState
 import com.practicum.playlistmaker.player.domain.usecases.GetMediaPlayerCurrentPositionUseCase
 import com.practicum.playlistmaker.player.domain.usecases.GetMediaPlayerStateUseCase
@@ -13,11 +16,11 @@ import com.practicum.playlistmaker.player.domain.usecases.PrepareMediaPlayerUseC
 import com.practicum.playlistmaker.player.domain.usecases.ReleaseMediaPlayerUseCase
 import com.practicum.playlistmaker.player.domain.usecases.StartMediaPlayerUseCase
 import com.practicum.playlistmaker.search.domain.models.Track
+import com.practicum.playlistmaker.search.ui.models.TrackUi
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class AudioPlayerViewModel(
-    private val savedTrack: Track?,
     private val preparePlayer: PrepareMediaPlayerUseCase,
     private val pausePlayer: PauseMediaPlayerUseCase,
     private val startPlayer: StartMediaPlayerUseCase,
@@ -28,6 +31,21 @@ class AudioPlayerViewModel(
     ViewModel() {
 
     val mainThreadHandler: Handler
+
+    private val savedTrack: Track = Track(
+        trackId = 0L,
+        trackName = "",
+        artistName = "",
+        trackTimeMillis = 0L,
+        trackTime = "",
+        artworkUrl100 = "",
+        artworkUrl512 = "",
+        collectionName = "",
+        releaseDate = "",
+        primaryGenreName = "",
+        country = "",
+        previewUrl = ""
+    )
 
     private val savedTrackLiveData =
         MutableLiveData<Track?>()
@@ -47,6 +65,28 @@ class AudioPlayerViewModel(
 
     init {
         mainThreadHandler = Handler(Looper.getMainLooper())
+    }
+
+    fun getSavedTrack(intent: Intent) {
+        val savedTrackUi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, TrackUi::class.java)
+        } else {
+            intent.getParcelableExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY)
+        }
+        savedTrack.apply {
+            trackId = savedTrackUi?.trackId!!
+            trackName = savedTrackUi.trackName
+            artistName = savedTrackUi.artistName
+            trackTimeMillis = savedTrackUi.trackTimeMillis
+            trackTime = savedTrackUi.trackTime
+            artworkUrl100 = savedTrackUi.artworkUrl100
+            artworkUrl512 = savedTrackUi.artworkUrl512
+            collectionName = savedTrackUi.collectionName
+            releaseDate = savedTrackUi.releaseDate
+            primaryGenreName = savedTrackUi.primaryGenreName
+            country = savedTrackUi.country
+            previewUrl = savedTrackUi.previewUrl
+        }
         savedTrackLiveData.value = savedTrack
         mainThreadHandler.post(listenerPlayerStateRunnable)
     }

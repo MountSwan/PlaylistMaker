@@ -1,30 +1,24 @@
 package com.practicum.playlistmaker.search.ui
 
-import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.search.domain.SearchHistoryRepository
 import com.practicum.playlistmaker.search.domain.TracksRepository
 import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 import com.practicum.playlistmaker.search.domain.models.SearchState
 import com.practicum.playlistmaker.search.domain.models.ShowMessage
 import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.search.domain.usecases.GetNetworkRequestStateUseCase
+import com.practicum.playlistmaker.search.domain.usecases.AddInHistoryUseCase
+import com.practicum.playlistmaker.search.domain.usecases.ClearHistoryUseCase
+import com.practicum.playlistmaker.search.domain.usecases.GetTracksFromSharedPrefsUseCase
 
 class TracksSearchViewModel(
-    private val searchHistory: SearchHistoryRepository,
-    private val nothingFoundMessage: String,
-    private val somethingWentWrongMessage: String,
-    private val mainThreadHandler: Handler,
     private val tracksRepository: TracksRepository,
-    private val getNetworkRequestState: GetNetworkRequestStateUseCase,
+    private val getTracksFromSharedPrefs: GetTracksFromSharedPrefsUseCase,
+    private val addInHistory: AddInHistoryUseCase,
+    private val clearHistory: ClearHistoryUseCase,
 ) : ViewModel() {
-
-    private val refreshCheckingMillis = 500L
-
-    private val listenerNetworkClient = checkRequestCompletion()
 
     private val showMessage = ShowMessage(
         text = "",
@@ -66,7 +60,7 @@ class TracksSearchViewModel(
     fun observeShowMessage(): LiveData<ShowMessage> = showMessageLiveData
 
     fun getTracksInHistoryFromSharedPrefs() {
-        searchHistory.getTracksFromSharedPrefs(tracksInHistory)
+        getTracksFromSharedPrefs.execute(tracksInHistory)
         searchState.tracksInHistorySize = tracksInHistory.size
         tracksInHistoryLiveData.value = tracksInHistory
     }
@@ -76,19 +70,28 @@ class TracksSearchViewModel(
         tracksLiveData.value = tracks
     }
 
-    fun searchTracks(searchRequest: String) {
+    fun searchTracks(
+        searchRequest: String,
+        nothingFoundMessage: String,
+        somethingWentWrongMessage: String
+    ) {
         searchState.refreshButtonIsVisible = false
         searchState.recyclerViewIsVisible = false
         searchState.progressBarIsVisible = true
         searchStateLiveData.value = searchState
 
-        tracksRepository.searchTracks(
-            searchRequest = searchRequest,
-            searchState = searchState,
-            tracks = tracks
-        )
-
-        mainThreadHandler.post(listenerNetworkClient)
+        val t = Thread {
+            executeRequestResult(
+                networkRequestState = tracksRepository.searchTracks(
+                    searchRequest = searchRequest,
+                    searchState = searchState,
+                    tracks = tracks
+                ),
+                nothingFoundMessage = nothingFoundMessage,
+                somethingWentWrongMessage = somethingWentWrongMessage
+            )
+        }
+        t.start()
 
     }
 
@@ -99,44 +102,34 @@ class TracksSearchViewModel(
     }
 
     fun clearHistory() {
-        searchHistory.clearHistory(tracksInHistory)
+        clearHistory.execute(tracksInHistory)
     }
 
     fun addInHistory(track: Track) {
-        searchHistory.addInHistory(track, tracksInHistory)
+        addInHistory.execute(track, tracksInHistory)
     }
 
     private fun showMessage(text: String, image: Int) {
         showMessage.text = text
         showMessage.image = image
-        showMessageLiveData.value = showMessage
+        showMessageLiveData.postValue(showMessage)
     }
 
-    private fun checkRequestCompletion(): Runnable {
-        return object : Runnable {
-            override fun run() {
-                if (searchState.requestIsComplete) {
-                    mainThreadHandler.removeCallbacks(listenerNetworkClient)
-                    searchState.requestIsComplete = false
-                    executeRequestResult()
-                } else {
-                    mainThreadHandler.postDelayed(this, refreshCheckingMillis)
-                }
-            }
-        }
-    }
-
-    private fun executeRequestResult() {
+    private fun executeRequestResult(
+        networkRequestState: NetworkRequestState,
+        nothingFoundMessage: String,
+        somethingWentWrongMessage: String
+    ) {
         searchState.progressBarIsVisible = false
-        searchStateLiveData.value = searchState
-        when (getNetworkRequestState.execute()) {
+        searchStateLiveData.postValue(searchState)
+        when (networkRequestState) {
             is NetworkRequestState.OnResponse.ExecutedRequest -> {
                 if (searchState.responseResultsIsNotEmpty) {
                     searchState.responseResultsIsNotEmpty = false
-                    tracksLiveData.value = tracks
+                    tracksLiveData.postValue(tracks)
                     searchState.recyclerViewIsVisible = true
                     searchState.adapterNotifyDataSetChanged = true
-                    searchStateLiveData.value = searchState
+                    searchStateLiveData.postValue(searchState)
                     searchState.adapterNotifyDataSetChanged = false
                 }
                 if (tracks.isEmpty()) {
@@ -149,15 +142,15 @@ class TracksSearchViewModel(
             is NetworkRequestState.OnResponse.IsNotExecutedRequest -> {
                 showMessage(somethingWentWrongMessage, R.drawable.disconnect)
                 searchState.refreshButtonIsVisible = true
-                searchStateLiveData.value = searchState
+                searchStateLiveData.postValue(searchState)
             }
 
             is NetworkRequestState.OnFailure -> {
                 searchState.progressBarIsVisible = false
-                searchStateLiveData.value = searchState
+                searchStateLiveData.postValue(searchState)
                 showMessage(somethingWentWrongMessage, R.drawable.disconnect)
                 searchState.refreshButtonIsVisible = true
-                searchStateLiveData.value = searchState
+                searchStateLiveData.postValue(searchState)
             }
 
             is NetworkRequestState.Default -> Unit
