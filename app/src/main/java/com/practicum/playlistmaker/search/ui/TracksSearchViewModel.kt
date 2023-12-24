@@ -4,20 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.search.domain.TracksRepository
+import com.practicum.playlistmaker.search.domain.AddInHistory
+import com.practicum.playlistmaker.search.domain.ClearHistory
+import com.practicum.playlistmaker.search.domain.GetTracksFromSharedPrefs
+import com.practicum.playlistmaker.search.domain.SearchTracks
 import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 import com.practicum.playlistmaker.search.domain.models.SearchState
 import com.practicum.playlistmaker.search.domain.models.ShowMessage
 import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.search.domain.usecases.AddInHistoryUseCase
-import com.practicum.playlistmaker.search.domain.usecases.ClearHistoryUseCase
-import com.practicum.playlistmaker.search.domain.usecases.GetTracksFromSharedPrefsUseCase
 
 class TracksSearchViewModel(
-    private val tracksRepository: TracksRepository,
-    private val getTracksFromSharedPrefs: GetTracksFromSharedPrefsUseCase,
-    private val addInHistory: AddInHistoryUseCase,
-    private val clearHistory: ClearHistoryUseCase,
+    private val searchTracks: SearchTracks,
+    private val getTracksFromSharedPrefs: GetTracksFromSharedPrefs,
+    private val addInHistory: AddInHistory,
+    private val clearHistory: ClearHistory,
 ) : ViewModel() {
 
     private val showMessage = ShowMessage(
@@ -82,7 +82,7 @@ class TracksSearchViewModel(
 
         val t = Thread {
             executeRequestResult(
-                networkRequestState = tracksRepository.searchTracks(
+                networkRequestState = searchTracks.execute(
                     searchRequest = searchRequest,
                     searchState = searchState,
                     tracks = tracks

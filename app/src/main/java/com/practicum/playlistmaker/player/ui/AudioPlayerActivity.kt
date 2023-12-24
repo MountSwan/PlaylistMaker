@@ -8,6 +8,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.domain.models.MediaPlayerState
+import com.practicum.playlistmaker.search.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AudioPlayerActivity : AppCompatActivity() {
@@ -28,45 +29,11 @@ class AudioPlayerActivity : AppCompatActivity() {
         viewModel.getSavedTrack(intent)
 
         viewModel.observeSavedTrack().observe(this) {
-            Glide.with(applicationContext)
-                .load(it?.artworkUrl512)
-                .placeholder(R.drawable.placeholder)
-                .centerCrop()
-                .transform(RoundedCorners(applicationContext.resources.getDimensionPixelSize(R.dimen.two_space)))
-                .into(binding.album)
-            binding.trackName.text = it?.trackName
-            binding.artistName.text = it?.artistName
-            binding.trackTime.text = it?.trackTime
-            binding.collection.text = it?.collectionName
-            binding.collectionGroup.isVisible = it?.collectionName?.isNotEmpty() == true
-            binding.year.text = it?.releaseDate?.take(FIRST_FOUR_CHARACTERS)
-            binding.genre.text = it?.primaryGenreName
-            binding.country.text = it?.country
+            drawScreen(it)
         }
 
         viewModel.observePlayerState().observe(this) {
-            when (it) {
-                is MediaPlayerState.Prepared.OnPrepared -> {
-                    binding.controlPlay.isEnabled = true
-                    viewModel.defineMediaPlayerStatePreparedAsDefault()
-                }
-
-                is MediaPlayerState.Prepared.OnCompletion -> {
-                    binding.controlPlay.setImageResource(R.drawable.control_play)
-                    binding.timePlayTrack.text = "00:00"
-                    viewModel.defineMediaPlayerStatePreparedAsDefault()
-                }
-
-                is MediaPlayerState.Playing -> {
-                    binding.controlPlay.setImageResource(R.drawable.control_pause)
-                }
-
-                is MediaPlayerState.Paused -> {
-                    binding.controlPlay.setImageResource(R.drawable.control_play)
-                }
-
-                is MediaPlayerState.Prepared.Default, MediaPlayerState.Default -> Unit
-            }
+            displayPlayer(it)
         }
 
         viewModel.observeTimePlayTrack().observe(this) {
@@ -90,6 +57,48 @@ class AudioPlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         viewModel.releasePlayer()
+    }
+
+    private fun drawScreen(savedTrack: Track?) {
+        Glide.with(applicationContext)
+            .load(savedTrack?.artworkUrl512)
+            .placeholder(R.drawable.placeholder)
+            .centerCrop()
+            .transform(RoundedCorners(applicationContext.resources.getDimensionPixelSize(R.dimen.two_space)))
+            .into(binding.album)
+        binding.trackName.text = savedTrack?.trackName
+        binding.artistName.text = savedTrack?.artistName
+        binding.trackTime.text = savedTrack?.trackTime
+        binding.collection.text = savedTrack?.collectionName
+        binding.collectionGroup.isVisible = savedTrack?.collectionName?.isNotEmpty() == true
+        binding.year.text = savedTrack?.releaseDate?.take(FIRST_FOUR_CHARACTERS)
+        binding.genre.text = savedTrack?.primaryGenreName
+        binding.country.text = savedTrack?.country
+    }
+
+    private fun displayPlayer(mediaPlayerState: MediaPlayerState) {
+        when (mediaPlayerState) {
+            is MediaPlayerState.Prepared.OnPrepared -> {
+                binding.controlPlay.isEnabled = true
+                viewModel.defineMediaPlayerStatePreparedAsDefault()
+            }
+
+            is MediaPlayerState.Prepared.OnCompletion -> {
+                binding.controlPlay.setImageResource(R.drawable.control_play)
+                binding.timePlayTrack.text = "00:00"
+                viewModel.defineMediaPlayerStatePreparedAsDefault()
+            }
+
+            is MediaPlayerState.Playing -> {
+                binding.controlPlay.setImageResource(R.drawable.control_pause)
+            }
+
+            is MediaPlayerState.Paused -> {
+                binding.controlPlay.setImageResource(R.drawable.control_play)
+            }
+
+            is MediaPlayerState.Prepared.Default, MediaPlayerState.Default -> Unit
+        }
     }
 
     companion object {

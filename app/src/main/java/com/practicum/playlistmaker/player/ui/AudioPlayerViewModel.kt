@@ -8,25 +8,25 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
+import com.practicum.playlistmaker.player.domain.GetMediaPlayerCurrentPosition
+import com.practicum.playlistmaker.player.domain.GetMediaPlayerState
+import com.practicum.playlistmaker.player.domain.PauseMediaPlayer
+import com.practicum.playlistmaker.player.domain.PrepareMediaPlayer
+import com.practicum.playlistmaker.player.domain.ReleaseMediaPlayer
+import com.practicum.playlistmaker.player.domain.StartMediaPlayer
 import com.practicum.playlistmaker.player.domain.models.MediaPlayerState
-import com.practicum.playlistmaker.player.domain.usecases.GetMediaPlayerCurrentPositionUseCase
-import com.practicum.playlistmaker.player.domain.usecases.GetMediaPlayerStateUseCase
-import com.practicum.playlistmaker.player.domain.usecases.PauseMediaPlayerUseCase
-import com.practicum.playlistmaker.player.domain.usecases.PrepareMediaPlayerUseCase
-import com.practicum.playlistmaker.player.domain.usecases.ReleaseMediaPlayerUseCase
-import com.practicum.playlistmaker.player.domain.usecases.StartMediaPlayerUseCase
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.ui.models.TrackUi
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class AudioPlayerViewModel(
-    private val preparePlayer: PrepareMediaPlayerUseCase,
-    private val pausePlayer: PauseMediaPlayerUseCase,
-    private val startPlayer: StartMediaPlayerUseCase,
-    private val releasePlayer: ReleaseMediaPlayerUseCase,
-    private val getPlayerCurrentPosition: GetMediaPlayerCurrentPositionUseCase,
-    private val getPlayerState: GetMediaPlayerStateUseCase,
+    private val preparePlayer: PrepareMediaPlayer,
+    private val pausePlayer: PauseMediaPlayer,
+    private val startPlayer: StartMediaPlayer,
+    private val releasePlayer: ReleaseMediaPlayer,
+    private val getPlayerCurrentPosition: GetMediaPlayerCurrentPosition,
+    private val getPlayerState: GetMediaPlayerState,
 ) :
     ViewModel() {
 

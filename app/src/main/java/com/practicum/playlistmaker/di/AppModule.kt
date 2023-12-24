@@ -11,7 +11,7 @@ val appModule = module {
 
     viewModel {
         TracksSearchViewModel(
-            tracksRepository = get(),
+            searchTracks = get(),
             getTracksFromSharedPrefs = get(),
             addInHistory = get(),
             clearHistory = get(),
@@ -35,7 +35,7 @@ val appModule = module {
 
     viewModel {
         SettingsViewModel(
-            editSharedPrefsUseCase = get(),
+            editSharedPrefs = get(),
             shareApp = get(),
             getSupport = get(),
             readUserAgreement = get()

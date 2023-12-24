@@ -23,7 +23,7 @@ class NetworkClientImpl(private val iTunesService: ITunesApi, private val contex
         networkRequestState = NetworkRequestState.Default
         tracksResponse.clear()
 
-        if (isConnected() == false) {
+        if (!isConnected()) {
             networkRequestState = NetworkRequestState.OnFailure
             return networkRequestState
         }
