@@ -9,9 +9,7 @@ interface NetworkClient {
 
     fun doRequest(
         searchRequest: String, searchState: SearchState,
-        tracks: ArrayList<Track>
-    )
-
-    fun networkRequestState(): NetworkRequestState
+        tracks: ArrayList<Track>, tracksResponse: ArrayList<TrackDto>
+    ) : NetworkRequestState
 
 }

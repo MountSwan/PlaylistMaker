@@ -4,8 +4,8 @@ import android.media.MediaPlayer
 import com.practicum.playlistmaker.player.domain.AudioPlayer
 import com.practicum.playlistmaker.player.domain.models.MediaPlayerState
 
-class AudioPlayerImpl() : AudioPlayer {
-    private var mediaPlayer = MediaPlayer()
+
+class AudioPlayerImpl(private val mediaPlayer: MediaPlayer) : AudioPlayer {
     private var mediaPlayerState: MediaPlayerState = MediaPlayerState.Default
 
     override fun preparePlayer(
@@ -32,7 +32,7 @@ class AudioPlayerImpl() : AudioPlayer {
     }
 
     override fun releasePlayer() {
-        mediaPlayer.release()
+        mediaPlayer.reset()
     }
 
     override fun playerCurrentPosition(): Int {

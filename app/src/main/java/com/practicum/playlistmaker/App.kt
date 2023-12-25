@@ -2,6 +2,11 @@ package com.practicum.playlistmaker
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.practicum.playlistmaker.di.appModule
+import com.practicum.playlistmaker.di.dataModule
+import com.practicum.playlistmaker.di.domainModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
 const val PRACTICUM_EXAMPLE_PREFERENCES = "practicum_example_preferences"
 const val EDIT_TEXT_KEY = "key_for_edit_text"
@@ -14,6 +19,11 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        startKoin{
+            androidContext(this@App)
+            modules(listOf(appModule, dataModule, domainModule))
+        }
 
         val sharedPrefs = getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE)
 

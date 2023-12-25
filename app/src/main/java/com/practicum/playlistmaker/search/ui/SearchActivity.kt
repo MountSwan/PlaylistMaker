@@ -11,13 +11,14 @@ import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.player.ui.AudioPlayerActivity
 import com.practicum.playlistmaker.search.ui.models.TrackUi
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
@@ -53,24 +54,15 @@ class SearchActivity : AppCompatActivity() {
         search(searchRequest)
     }
 
-    private lateinit var viewModel: TracksSearchViewModel
+    private val viewModel by viewModel<TracksSearchViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(
-            this,
-            TracksSearchViewModelFactory(applicationContext, mainThreadHandler)
-        ).get(
-            TracksSearchViewModel::class.java
-        )
-
         inputMethodManager =
             getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-
-
 
         viewModel.observeTracks().observe(this) {
             adapter.tracks = it
@@ -187,7 +179,11 @@ class SearchActivity : AppCompatActivity() {
 
     private fun search(searchRequest: Editable?) {
         if (searchRequest?.isNotEmpty() == true) {
-            viewModel.searchTracks(searchRequest.toString())
+            viewModel.searchTracks(
+                searchRequest = searchRequest.toString(),
+                nothingFoundMessage = getString(R.string.nothing_found),
+                somethingWentWrongMessage = getString(R.string.something_went_wrong)
+            )
             viewModel.observeSearchState().observe(this) {
                 binding.refreshButton.isVisible = it.refreshButtonIsVisible
                 binding.recyclerView.isVisible = it.recyclerViewIsVisible

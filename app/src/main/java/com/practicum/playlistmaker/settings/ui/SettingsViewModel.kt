@@ -4,16 +4,16 @@ import android.content.res.Configuration
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.practicum.playlistmaker.settings.domain.usecases.EditSharedPrefsUseCase
-import com.practicum.playlistmaker.settings.domain.usecases.GetSupportUseCase
-import com.practicum.playlistmaker.settings.domain.usecases.ReadUserAgreementUseCase
-import com.practicum.playlistmaker.settings.domain.usecases.ShareAppUseCase
+import com.practicum.playlistmaker.settings.domain.EditSharedPrefs
+import com.practicum.playlistmaker.settings.domain.GetSupport
+import com.practicum.playlistmaker.settings.domain.ReadUserAgreement
+import com.practicum.playlistmaker.settings.domain.ShareApp
 
 class SettingsViewModel(
-    private val editSharedPrefsUseCase: EditSharedPrefsUseCase,
-    private val shareApp: ShareAppUseCase,
-    private val getSupport: GetSupportUseCase,
-    private val readUserAgreement: ReadUserAgreementUseCase,
+    private val editSharedPrefs: EditSharedPrefs,
+    private val shareApp: ShareApp,
+    private val getSupport: GetSupport,
+    private val readUserAgreement: ReadUserAgreement,
 ) :
     ViewModel() {
 
@@ -31,7 +31,7 @@ class SettingsViewModel(
     }
 
     fun editSharedPrefs(checked: Boolean) {
-        editSharedPrefsUseCase.execute(checked)
+        editSharedPrefs.execute(checked)
     }
 
     fun shareApp() {

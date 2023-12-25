@@ -3,13 +3,13 @@ package com.practicum.playlistmaker.settings.ui
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: SettingsViewModel
+    private val viewModel by viewModel<SettingsViewModel>()
 
     private lateinit var binding: ActivitySettingsBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,10 +20,6 @@ class SettingsActivity : AppCompatActivity() {
         binding.ivArrowBack.setOnClickListener {
             finish()
         }
-
-        viewModel = ViewModelProvider(this, SettingsViewModelFactory(applicationContext)).get(
-            SettingsViewModel::class.java
-        )
 
         viewModel.getSwitchThemeState(resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK))
         viewModel.observeSwitchThemeState().observe(this) {
