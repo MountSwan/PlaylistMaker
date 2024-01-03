@@ -4,7 +4,7 @@ import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 import com.practicum.playlistmaker.search.domain.models.SearchState
 import com.practicum.playlistmaker.search.domain.models.Track
 
-interface SearchTracks {
+interface SearchTracksUseCase {
     fun execute(
         searchRequest: String,
         searchState: SearchState,

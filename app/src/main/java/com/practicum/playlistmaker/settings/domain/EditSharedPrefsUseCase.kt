@@ -1,5 +1,5 @@
 package com.practicum.playlistmaker.settings.domain
 
-interface EditSharedPrefs {
+interface EditSharedPrefsUseCase {
     fun execute(checked: Boolean)
 }

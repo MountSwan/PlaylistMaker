@@ -57,7 +57,7 @@ val dataModule = module {
         TracksRepositoryImpl(get())
     }
 
-    single<AudioPlayer> {
+    factory<AudioPlayer> {
         AudioPlayerImpl(get())
     }
 
