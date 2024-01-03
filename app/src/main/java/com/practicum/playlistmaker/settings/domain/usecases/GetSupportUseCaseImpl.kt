@@ -1,9 +1,10 @@
 package com.practicum.playlistmaker.settings.domain.usecases
 
 import com.practicum.playlistmaker.settings.domain.ExternalNavigator
-import com.practicum.playlistmaker.settings.domain.GetSupport
+import com.practicum.playlistmaker.settings.domain.GetSupportUseCase
 
-class GetSupportUseCase(private val externalNavigator: ExternalNavigator) : GetSupport {
+class GetSupportUseCaseImpl(private val externalNavigator: ExternalNavigator) :
+    GetSupportUseCase {
     override fun execute() {
         externalNavigator.getSupport()
     }

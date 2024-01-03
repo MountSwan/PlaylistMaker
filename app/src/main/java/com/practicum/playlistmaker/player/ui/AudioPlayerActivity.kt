@@ -1,19 +1,23 @@
 package com.practicum.playlistmaker.player.ui
 
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.domain.models.MediaPlayerState
 import com.practicum.playlistmaker.search.domain.models.Track
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.practicum.playlistmaker.search.ui.models.TrackUi
+import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.core.parameter.parametersOf
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    private val viewModel by viewModel<AudioPlayerViewModel>()
+    private lateinit var viewModel :AudioPlayerViewModel
 
     private lateinit var binding: ActivityAudioplayerBinding
 
@@ -26,7 +30,9 @@ class AudioPlayerActivity : AppCompatActivity() {
             finish()
         }
 
-        viewModel.getSavedTrack(intent)
+        viewModel = getViewModel {
+            parametersOf(getSavedTrack())
+        }
 
         viewModel.observeSavedTrack().observe(this) {
             drawScreen(it)
@@ -98,6 +104,30 @@ class AudioPlayerActivity : AppCompatActivity() {
             }
 
             is MediaPlayerState.Prepared.Default, MediaPlayerState.Default -> Unit
+        }
+    }
+
+    private fun getSavedTrack(): Track? {
+        val savedTrackUi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, TrackUi::class.java)
+        } else {
+            intent.getParcelableExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY)
+        }
+        return savedTrackUi?.let {
+            Track(
+                trackId = it.trackId,
+                trackName = it.trackName,
+                artistName = it.artistName,
+                trackTimeMillis = it.trackTimeMillis,
+                trackTime = it.trackTime,
+                artworkUrl100 = it.artworkUrl100,
+                artworkUrl512 = it.artworkUrl512,
+                collectionName = it.collectionName,
+                releaseDate = it.releaseDate,
+                primaryGenreName = it.primaryGenreName,
+                country = it.country,
+                previewUrl = it.previewUrl
+            )
         }
     }
 
