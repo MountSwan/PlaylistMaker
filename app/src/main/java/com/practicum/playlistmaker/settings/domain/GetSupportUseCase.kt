@@ -1,5 +1,5 @@
 package com.practicum.playlistmaker.settings.domain
 
-interface ReadUserAgreement {
+interface GetSupportUseCase {
     fun execute()
 }

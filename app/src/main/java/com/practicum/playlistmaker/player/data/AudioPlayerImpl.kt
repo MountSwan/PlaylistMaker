@@ -32,7 +32,7 @@ class AudioPlayerImpl(private val mediaPlayer: MediaPlayer) : AudioPlayer {
     }
 
     override fun releasePlayer() {
-        mediaPlayer.reset()
+        mediaPlayer.release()
     }
 
     override fun playerCurrentPosition(): Int {

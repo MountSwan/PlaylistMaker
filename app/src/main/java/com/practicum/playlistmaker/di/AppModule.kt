@@ -1,7 +1,10 @@
 package com.practicum.playlistmaker.di
 
+import com.practicum.playlistmaker.library.ui.FavoriteTracksViewModel
+import com.practicum.playlistmaker.library.ui.PlaylistsViewModel
 import com.practicum.playlistmaker.main.ui.MainActivityViewModel
 import com.practicum.playlistmaker.player.ui.AudioPlayerViewModel
+import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.ui.TracksSearchViewModel
 import com.practicum.playlistmaker.settings.ui.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -23,13 +26,17 @@ val appModule = module {
     }
 
     viewModel {
+        FavoriteTracksViewModel()
+    }
+
+    viewModel {
+        PlaylistsViewModel()
+    }
+
+    viewModel {(savedTrack: Track?) ->
         AudioPlayerViewModel(
-            preparePlayer = get(),
-            pausePlayer = get(),
-            startPlayer = get(),
-            releasePlayer = get(),
-            getPlayerCurrentPosition = get(),
-            getPlayerState = get(),
+            savedTrack = savedTrack,
+            mediaPlayerInteractor = get(),
         )
     }
 
