@@ -9,7 +9,7 @@ class AudioPlayerImpl(private val mediaPlayer: MediaPlayer) : AudioPlayer {
     private var mediaPlayerState: MediaPlayerState = MediaPlayerState.Default
 
     override fun preparePlayer(
-        urlForPlaying: String?,
+        urlForPlaying: String,
     ) {
         mediaPlayer.setDataSource(urlForPlaying)
         mediaPlayer.prepareAsync()

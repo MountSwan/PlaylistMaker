@@ -33,7 +33,7 @@ val appModule = module {
         PlaylistsViewModel()
     }
 
-    viewModel {(savedTrack: Track?) ->
+    viewModel {(savedTrack: Track) ->
         AudioPlayerViewModel(
             savedTrack = savedTrack,
             mediaPlayerInteractor = get(),

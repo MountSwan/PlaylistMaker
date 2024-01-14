@@ -1,29 +1,35 @@
 package com.practicum.playlistmaker.search.ui
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
-import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.databinding.ActivitySearchBinding
+import com.practicum.playlistmaker.databinding.FragmentSearchBinding
+import com.practicum.playlistmaker.main.ui.MainActivity
 import com.practicum.playlistmaker.player.ui.AudioPlayerActivity
+import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.ui.models.TrackUi
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
 
     companion object {
-        const val SEARCH_REQUEST = "SEARCH_REQUEST"
+        private const val SCREEN_IS_ROTATE = "SCREEN_IS_ROTATE"
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
@@ -43,41 +49,50 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private lateinit var binding: ActivitySearchBinding
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
+
     private var searchRequest: Editable? = null
-    private var inputMethodManager: InputMethodManager? = null
+
     private var isClickAllowed = true
 
     private val mainThreadHandler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable {
-        inputMethodManager?.hideSoftInputFromWindow(binding.inputEditText.windowToken, 0)
+        hideKeyboard((activity as MainActivity))
         search(searchRequest)
     }
 
-    private val viewModel by viewModel<TracksSearchViewModel>()
+    private val viewModel: TracksSearchViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        inputMethodManager =
-            getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        viewModel.observeTracks().observe(this) {
+        viewModel.observeTracks().observe(viewLifecycleOwner) {
             adapter.tracks = it
         }
 
-        viewModel.getTracksInHistoryFromSharedPrefs()
-        viewModel.observeTracksInHistory().observe(this) {
+        if (savedInstanceState?.getBoolean(SCREEN_IS_ROTATE) != true) {
+            viewModel.getTracksInHistoryFromSharedPrefs()
+        }
+
+        viewModel.observeTracksInHistory().observe(viewLifecycleOwner) {
             adapterHistory.tracks = it
+            Log.e("AAA", "$it")
             binding.inputEditText.setOnFocusChangeListener { view, hasFocus ->
                 binding.historyOfSearch.isVisible =
                     hasFocus && binding.inputEditText.text.isEmpty() && it.size > 0
             }
         }
 
-        viewModel.observeShowMessage().observe(this) {
+        viewModel.observeShowMessage().observe(viewLifecycleOwner) {
             if (it.text.isNotEmpty()) {
                 binding.placeholderMessage.isVisible = true
                 binding.placeholderImage.isVisible = true
@@ -91,20 +106,16 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.recyclerView.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.adapter = adapter
 
         binding.recyclerViewOfHistory.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyclerViewOfHistory.adapter = adapterHistory
-
-        binding.arrowBackImage.setOnClickListener {
-            finish()
-        }
 
         binding.clearIcon.setOnClickListener {
             binding.inputEditText.setText("")
-            inputMethodManager?.hideSoftInputFromWindow(binding.inputEditText.windowToken, 0)
+            hideKeyboard((activity as MainActivity))
             hideAllExceptHistory()
         }
 
@@ -125,7 +136,7 @@ class SearchActivity : AppCompatActivity() {
                 count: Int
             ) {
                 viewModel.doOnTextChange(textSearch)
-                viewModel.observeSearchState().observe(this@SearchActivity) {
+                viewModel.observeSearchState().observe(viewLifecycleOwner) {
                     binding.clearIcon.isVisible = it.clearButtonVisibility
                     if (binding.inputEditText.hasFocus() && textSearch?.isEmpty() == true && it.tracksInHistorySize > 0) {
                         hideAllExceptHistory()
@@ -142,6 +153,7 @@ class SearchActivity : AppCompatActivity() {
                 // empty
             }
         }
+
         binding.inputEditText.addTextChangedListener(simpleTextWatcher)
 
         binding.inputEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -168,13 +180,27 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(SEARCH_REQUEST, text)
+        outState.putBoolean(SCREEN_IS_ROTATE, true)
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        text = savedInstanceState.getString(SEARCH_REQUEST, "")
-        binding.inputEditText.setText(text)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun hideKeyboard(activity: Activity) {
+        try {
+            val inputManager = activity
+                .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val currentFocusedView = activity.currentFocus
+            if (currentFocusedView != null) {
+                inputManager.hideSoftInputFromWindow(
+                    binding.inputEditText.windowToken, 0
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun search(searchRequest: Editable?) {
@@ -184,7 +210,7 @@ class SearchActivity : AppCompatActivity() {
                 nothingFoundMessage = getString(R.string.nothing_found),
                 somethingWentWrongMessage = getString(R.string.something_went_wrong)
             )
-            viewModel.observeSearchState().observe(this) {
+            viewModel.observeSearchState().observe(viewLifecycleOwner) {
                 binding.refreshButton.isVisible = it.refreshButtonIsVisible
                 binding.recyclerView.isVisible = it.recyclerViewIsVisible
                 binding.progressBar.isVisible = it.progressBarIsVisible
@@ -215,7 +241,7 @@ class SearchActivity : AppCompatActivity() {
             country = track.country,
             previewUrl = track.previewUrl
         )
-        val audioPlayerIntent = Intent(this, AudioPlayerActivity::class.java).apply {
+        val audioPlayerIntent = Intent(requireContext(), AudioPlayerActivity::class.java).apply {
             putExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, trackUi)
         }
         startActivity(audioPlayerIntent)
@@ -239,7 +265,10 @@ class SearchActivity : AppCompatActivity() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            mainThreadHandler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            mainThreadHandler.postDelayed(
+                { isClickAllowed = true },
+                CLICK_DEBOUNCE_DELAY
+            )
         }
         return current
     }

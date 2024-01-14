@@ -4,7 +4,7 @@ import com.practicum.playlistmaker.player.domain.models.MediaPlayerState
 
 class MediaPlayerInteractorImpl(private val audioPlayer: AudioPlayer) : MediaPlayerInteractor {
 
-    override fun preparePlayer(urlForPlaying: String?) {
+    override fun preparePlayer(urlForPlaying: String) {
         audioPlayer.preparePlayer(urlForPlaying)
     }
 

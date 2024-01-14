@@ -5,13 +5,15 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
+private const val LIBRARY_TABS_COUNT = 2
+
 class LibraryViewPagerAdapter(
     fragmentManager: FragmentManager,
     lifecycle: Lifecycle
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
     override fun getItemCount(): Int {
-        return 2
+        return LIBRARY_TABS_COUNT
     }
 
     override fun createFragment(position: Int): Fragment {

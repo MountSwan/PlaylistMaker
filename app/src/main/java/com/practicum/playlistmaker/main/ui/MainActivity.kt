@@ -1,18 +1,14 @@
 package com.practicum.playlistmaker.main.ui
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.practicum.playlistmaker.library.ui.LibraryActivity
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityMainBinding
-import com.practicum.playlistmaker.search.ui.SearchActivity
-import com.practicum.playlistmaker.settings.ui.SettingsActivity
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class MainActivity : AppCompatActivity() {
-
-    private val viewModel by viewModel<MainActivityViewModel>()
 
     private lateinit var binding: ActivityMainBinding
 
@@ -21,20 +17,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.searchButton.setOnClickListener {
-            val searchIntent = Intent(this, SearchActivity::class.java)
-            startActivity(searchIntent)
-        }
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.container_view) as NavHostFragment
+        val navController = navHostFragment.navController
 
-        binding.mediaLibraryButton.setOnClickListener {
-            val libraryIntent = Intent(this, LibraryActivity::class.java)
-            startActivity(libraryIntent)
-        }
-
-        binding.settingsButton.setOnClickListener {
-            val settingsIntent = Intent(this, SettingsActivity::class.java)
-            startActivity(settingsIntent)
-        }
+        binding.bottomNavigationView.setupWithNavController(navController)
 
     }
 

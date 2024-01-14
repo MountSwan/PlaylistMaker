@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class AudioPlayerViewModel(
-    private val savedTrack: Track?,
+    private val savedTrack: Track,
     private val mediaPlayerInteractor: MediaPlayerInteractor,
 ) :
     ViewModel() {
@@ -20,9 +20,9 @@ class AudioPlayerViewModel(
     val mainThreadHandler: Handler
 
     private val savedTrackLiveData =
-        MutableLiveData<Track?>()
+        MutableLiveData<Track>()
 
-    fun observeSavedTrack(): LiveData<Track?> = savedTrackLiveData
+    fun observeSavedTrack(): LiveData<Track> = savedTrackLiveData
 
     private val playerStateLiveData =
         MutableLiveData<MediaPlayerState>()
@@ -46,7 +46,7 @@ class AudioPlayerViewModel(
     }
 
     fun preparePlayer() {
-        mediaPlayerInteractor.preparePlayer(savedTrack?.previewUrl)
+        mediaPlayerInteractor.preparePlayer(savedTrack.previewUrl)
     }
 
     fun playbackControl() {

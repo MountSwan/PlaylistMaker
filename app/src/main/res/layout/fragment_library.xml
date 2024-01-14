@@ -3,22 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/StandardScreen"
-    android:background="@color/background_activity_settings"
-    tools:context=".library.ui.LibraryActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@color/background_activity_settings"
+    android:orientation="vertical"
+    tools:context="com.practicum.playlistmaker.library.ui.LibraryFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <ImageView
-            android:id="@+id/ivArrowBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/one_space"
-            android:src="@drawable/arrow_back" />
+        android:layout_height="wrap_content">
 
         <TextView
             style="@style/TextHeaderSettings"
@@ -31,13 +24,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/background_activity_settings"
-        app:tabTextColor="@color/text_color"
         app:tabIndicatorColor="@color/text_color"
         app:tabIndicatorFullWidth="true"
-        app:tabMode="fixed"/>
+        app:tabMode="fixed"
+        app:tabTextColor="@color/text_color" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 </LinearLayout>
