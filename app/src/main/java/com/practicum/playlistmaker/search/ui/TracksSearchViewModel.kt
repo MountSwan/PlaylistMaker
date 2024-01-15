@@ -73,7 +73,7 @@ class TracksSearchViewModel(
     fun searchTracks(
         searchRequest: String,
         nothingFoundMessage: String,
-        somethingWentWrongMessage: String
+        somethingWentWrongMessage: String,
     ) {
         searchState.refreshButtonIsVisible = false
         searchState.recyclerViewIsVisible = false

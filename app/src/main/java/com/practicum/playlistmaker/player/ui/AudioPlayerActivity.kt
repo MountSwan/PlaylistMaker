@@ -105,7 +105,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun getSavedTrack(): Track {
+    private fun getSavedTrack(): Track? {
         val savedTrackUi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, TrackUi::class.java)
         } else {
@@ -114,9 +114,9 @@ class AudioPlayerActivity : AppCompatActivity() {
         if (savedTrackUi == null) {
             finish()
         }
-        return savedTrackUi.let {
+        return savedTrackUi?.let {
             Track(
-                trackId = it!!.trackId,
+                trackId = it.trackId,
                 trackName = it.trackName,
                 artistName = it.artistName,
                 trackTimeMillis = it.trackTimeMillis,

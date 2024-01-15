@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.search.ui
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,7 +7,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
-import com.practicum.playlistmaker.main.ui.MainActivity
 import com.practicum.playlistmaker.player.ui.AudioPlayerActivity
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.ui.models.TrackUi
@@ -54,11 +51,12 @@ class SearchFragment : Fragment() {
 
     private var searchRequest: Editable? = null
 
+    private var inputMethodManager: InputMethodManager? = null
     private var isClickAllowed = true
 
     private val mainThreadHandler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable {
-        hideKeyboard((activity as MainActivity))
+        inputMethodManager?.hideSoftInputFromWindow(binding.inputEditText.windowToken, 0)
         search(searchRequest)
     }
 
@@ -75,17 +73,19 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        inputMethodManager =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+
         viewModel.observeTracks().observe(viewLifecycleOwner) {
             adapter.tracks = it
         }
 
-        if (savedInstanceState?.getBoolean(SCREEN_IS_ROTATE) != true) {
+        if (savedInstanceState == null) {
             viewModel.getTracksInHistoryFromSharedPrefs()
         }
 
         viewModel.observeTracksInHistory().observe(viewLifecycleOwner) {
             adapterHistory.tracks = it
-            Log.e("AAA", "$it")
             binding.inputEditText.setOnFocusChangeListener { view, hasFocus ->
                 binding.historyOfSearch.isVisible =
                     hasFocus && binding.inputEditText.text.isEmpty() && it.size > 0
@@ -115,7 +115,7 @@ class SearchFragment : Fragment() {
 
         binding.clearIcon.setOnClickListener {
             binding.inputEditText.setText("")
-            hideKeyboard((activity as MainActivity))
+            inputMethodManager?.hideSoftInputFromWindow(binding.inputEditText.windowToken, 0)
             hideAllExceptHistory()
         }
 
@@ -183,32 +183,22 @@ class SearchFragment : Fragment() {
         outState.putBoolean(SCREEN_IS_ROTATE, true)
     }
 
+    override fun onPause() {
+        super.onPause()
+        mainThreadHandler.removeCallbacks(searchRunnable)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun hideKeyboard(activity: Activity) {
-        try {
-            val inputManager = activity
-                .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            val currentFocusedView = activity.currentFocus
-            if (currentFocusedView != null) {
-                inputManager.hideSoftInputFromWindow(
-                    binding.inputEditText.windowToken, 0
-                )
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     private fun search(searchRequest: Editable?) {
         if (searchRequest?.isNotEmpty() == true) {
             viewModel.searchTracks(
                 searchRequest = searchRequest.toString(),
-                nothingFoundMessage = getString(R.string.nothing_found),
-                somethingWentWrongMessage = getString(R.string.something_went_wrong)
+                nothingFoundMessage = requireContext().getString(R.string.nothing_found),
+                somethingWentWrongMessage = requireContext().getString(R.string.something_went_wrong)
             )
             viewModel.observeSearchState().observe(viewLifecycleOwner) {
                 binding.refreshButton.isVisible = it.refreshButtonIsVisible

@@ -5,7 +5,7 @@ import com.practicum.playlistmaker.player.domain.models.MediaPlayerState
 
 interface AudioPlayer {
 
-    fun preparePlayer(urlForPlaying: String)
+    fun preparePlayer(urlForPlaying: String?)
 
     fun startPlayer()
 
