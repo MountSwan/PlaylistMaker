@@ -22,19 +22,19 @@ import org.koin.dsl.module
 
 val domainModule = module {
 
-    single<GetTracksFromSharedPrefsUseCase> {
+    factory<GetTracksFromSharedPrefsUseCase> {
         GetTracksFromSharedPrefsUseCaseImpl(get())
     }
 
-    single<AddInHistoryUseCase> {
+    factory<AddInHistoryUseCase> {
         AddInHistoryUseCaseImpl(get())
     }
 
-    single<ClearHistoryUseCase> {
+    factory<ClearHistoryUseCase> {
         ClearHistoryUseCaseImpl(get())
     }
 
-    single<SearchTracksUseCase> {
+    factory<SearchTracksUseCase> {
         SearchTracksUseCaseImpl(get())
     }
 
@@ -42,19 +42,19 @@ val domainModule = module {
         MediaPlayerInteractorImpl(get())
     }
 
-    single<EditSharedPrefsUseCase> {
+    factory<EditSharedPrefsUseCase> {
         EditSharedPrefsUseCaseImpl(get())
     }
 
-    single<ShareAppUseCase> {
+    factory<ShareAppUseCase> {
         ShareAppUseCaseImpl(get())
     }
 
-    single<GetSupportUseCase> {
+    factory<GetSupportUseCase> {
         GetSupportUseCaseImpl(get())
     }
 
-    single<ReadUserAgreementUseCase> {
+    factory<ReadUserAgreementUseCase> {
         ReadUserAgreementUseCaseImpl(get())
     }
 

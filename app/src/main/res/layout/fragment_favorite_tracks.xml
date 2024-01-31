@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context="com.practicum.playlistmaker.library.ui.FavoriteTracksFragment">
 
     <ImageView
         android:id="@+id/placeholderImage"
@@ -21,12 +22,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/four_space"
         android:fontFamily="@font/ys_display_medium"
+        android:text="@string/empty_library"
         android:textAlignment="center"
         android:textColor="@color/text_color"
         android:textSize="@dimen/nineteen_size_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/placeholderImage"
-        android:text="@string/empty_library" />
+        app:layout_constraintTop_toBottomOf="@id/placeholderImage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

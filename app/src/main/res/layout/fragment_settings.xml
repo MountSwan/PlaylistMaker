@@ -2,20 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/StandardScreen"
-    android:padding="@dimen/four_space"
     android:background="@color/background_activity_settings"
-    tools:context=".settings.ui.SettingsActivity">
+    android:padding="@dimen/four_space"
+    tools:context="com.practicum.playlistmaker.settings.ui.SettingsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/six_space" >
-
-        <ImageView
-            android:id="@+id/ivArrowBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/arrow_back" />
+        android:layout_marginBottom="@dimen/six_space">
 
         <TextView
             style="@style/TextHeaderSettings"
@@ -27,15 +21,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <TextView
-        style="@style/MenuSettings"
-        android:text="@string/setting1_dark_theme" />
+        <TextView
+            style="@style/MenuSettings"
+            android:text="@string/setting1_dark_theme" />
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/smThemeSwitcher"
-        android:layout_gravity="end"
-        android:layout_width="@dimen/fourteen_space"
-        android:layout_height="@dimen/fourteen_space"/>
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/smThemeSwitcher"
+            android:layout_width="@dimen/fourteen_space"
+            android:layout_height="@dimen/fourteen_space"
+            android:layout_gravity="end" />
 
     </FrameLayout>
 

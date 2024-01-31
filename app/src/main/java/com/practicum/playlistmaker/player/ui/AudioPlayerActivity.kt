@@ -12,12 +12,14 @@ import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.domain.models.MediaPlayerState
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.ui.models.TrackUi
-import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    private lateinit var viewModel :AudioPlayerViewModel
+    private val viewModel by viewModel<AudioPlayerViewModel> {
+        parametersOf(getSavedTrack())
+    }
 
     private lateinit var binding: ActivityAudioplayerBinding
 
@@ -28,10 +30,6 @@ class AudioPlayerActivity : AppCompatActivity() {
 
         binding.arrowBackImage.setOnClickListener {
             finish()
-        }
-
-        viewModel = getViewModel {
-            parametersOf(getSavedTrack())
         }
 
         viewModel.observeSavedTrack().observe(this) {
@@ -113,6 +111,9 @@ class AudioPlayerActivity : AppCompatActivity() {
         } else {
             intent.getParcelableExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY)
         }
+        if (savedTrackUi == null) {
+            finish()
+        }
         return savedTrackUi?.let {
             Track(
                 trackId = it.trackId,
@@ -129,6 +130,7 @@ class AudioPlayerActivity : AppCompatActivity() {
                 previewUrl = it.previewUrl
             )
         }
+
     }
 
     companion object {
