@@ -1,13 +1,15 @@
 package com.practicum.playlistmaker.player.ui
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.MediaPlayerInteractor
 import com.practicum.playlistmaker.player.domain.models.MediaPlayerState
 import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -16,8 +18,6 @@ class AudioPlayerViewModel(
     private val mediaPlayerInteractor: MediaPlayerInteractor,
 ) :
     ViewModel() {
-
-    val mainThreadHandler: Handler
 
     private val savedTrackLiveData =
         MutableLiveData<Track?>()
@@ -32,13 +32,26 @@ class AudioPlayerViewModel(
     private val timePlayTrackLiveData = MutableLiveData<String>()
     fun observeTimePlayTrack(): LiveData<String> = timePlayTrackLiveData
 
-    private val timerRunnable = createUpdateTimerTask()
-    private val listenerPlayerStateRunnable = listenerPlayerState()
+    private var timerJob: Job? = null
+    private var listenerPlayerStateJob: Job? = null
 
     init {
-        mainThreadHandler = Handler(Looper.getMainLooper())
         savedTrackLiveData.value = savedTrack
-        mainThreadHandler.post(listenerPlayerStateRunnable)
+        listenerPlayerStateJob = viewModelScope.launch {
+            while (true) {
+                delay(REFRESH_TIMER_MILLIS)
+                when (mediaPlayerInteractor.playerState()) {
+                    is MediaPlayerState.Prepared.OnCompletion -> {
+                        timerJob?.cancel()
+                        playerStateLiveData.value = mediaPlayerInteractor.playerState()
+                    }
+
+                    else -> {
+                        playerStateLiveData.value = mediaPlayerInteractor.playerState()
+                    }
+                }
+            }
+        }
     }
 
     fun defineMediaPlayerStatePreparedAsDefault() {
@@ -65,60 +78,32 @@ class AudioPlayerViewModel(
 
     private fun startPlayer() {
         mediaPlayerInteractor.startPlayer()
-        mainThreadHandler.post(timerRunnable)
-    }
-
-    fun pausePlayer() {
-        mediaPlayerInteractor.pausePlayer()
-        mainThreadHandler.removeCallbacks(timerRunnable)
-    }
-
-    fun releasePlayer() {
-        mainThreadHandler.removeCallbacks(timerRunnable)
-        mainThreadHandler.removeCallbacks(listenerPlayerStateRunnable)
-        mediaPlayerInteractor.releasePlayer()
-    }
-
-    private fun listenerPlayerState(): Runnable {
-        return object : Runnable {
-            override fun run() {
-                when (mediaPlayerInteractor.playerState()) {
-                    is MediaPlayerState.Prepared.OnCompletion -> {
-                        mainThreadHandler.removeCallbacks(timerRunnable)
-                        playerStateLiveData.value = mediaPlayerInteractor.playerState()
-                    }
-
-                    else -> {
-                        playerStateLiveData.value = mediaPlayerInteractor.playerState()
-                    }
-                }
-
-                mainThreadHandler.postDelayed(this, REFRESH_TIMER_MILLIS)
-            }
-        }
-    }
-
-    private fun createUpdateTimerTask(): Runnable {
-        return object : Runnable {
-            override fun run() {
+        timerJob = viewModelScope.launch {
+            while (mediaPlayerInteractor.playerState() == MediaPlayerState.Playing) {
+                delay(REFRESH_TIMER_MILLIS)
                 timePlayTrackLiveData.value =
                     SimpleDateFormat(
                         "mm:ss",
                         Locale.getDefault()
                     ).format(mediaPlayerInteractor.playerCurrentPosition())
-                mainThreadHandler.postDelayed(this, REFRESH_TIMER_MILLIS)
             }
         }
+
     }
 
-    override fun onCleared() {
-        mainThreadHandler.removeCallbacks(timerRunnable)
-        mainThreadHandler.removeCallbacks(listenerPlayerStateRunnable)
-        super.onCleared()
+    fun pausePlayer() {
+        mediaPlayerInteractor.pausePlayer()
+        timerJob?.cancel()
+    }
+
+    fun releasePlayer() {
+        timerJob?.cancel()
+        listenerPlayerStateJob?.cancel()
+        mediaPlayerInteractor.releasePlayer()
     }
 
     companion object {
-        private const val REFRESH_TIMER_MILLIS = 500L
+        private const val REFRESH_TIMER_MILLIS = 300L
     }
 
 }

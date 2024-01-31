@@ -6,6 +6,8 @@ import com.practicum.playlistmaker.search.domain.TracksRepository
 import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 import com.practicum.playlistmaker.search.domain.models.SearchState
 import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRepository {
 
@@ -15,7 +17,7 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
         searchRequest: String,
         searchState: SearchState,
         tracks: ArrayList<Track>
-    ): NetworkRequestState {
+    ): Flow<NetworkRequestState> = flow {
         val networkRequestState =
             networkClient.doRequest(searchRequest, searchState, tracks, tracksResponse)
         if (tracksResponse.isNotEmpty()) {
@@ -38,7 +40,7 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
 
             searchState.responseResultsIsNotEmpty = true
         }
-        return networkRequestState
+        emit(networkRequestState)
     }
 
 }
