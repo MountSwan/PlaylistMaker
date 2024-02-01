@@ -57,11 +57,11 @@ val dataModule = module {
         TracksRepositoryImpl(get())
     }
 
-    factory<AudioPlayer> {
+    single<AudioPlayer> {
         AudioPlayerImpl(get())
     }
 
-    factory { MediaPlayer() }
+    single { MediaPlayer() }
 
     single<ThemeSwitcherState> {
         ThemeSwitcherStateImpl(get())

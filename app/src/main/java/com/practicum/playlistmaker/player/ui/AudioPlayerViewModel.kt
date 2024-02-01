@@ -37,21 +37,6 @@ class AudioPlayerViewModel(
 
     init {
         savedTrackLiveData.value = savedTrack
-        listenerPlayerStateJob = viewModelScope.launch {
-            while (true) {
-                delay(REFRESH_TIMER_MILLIS)
-                when (mediaPlayerInteractor.playerState()) {
-                    is MediaPlayerState.Prepared.OnCompletion -> {
-                        timerJob?.cancel()
-                        playerStateLiveData.value = mediaPlayerInteractor.playerState()
-                    }
-
-                    else -> {
-                        playerStateLiveData.value = mediaPlayerInteractor.playerState()
-                    }
-                }
-            }
-        }
     }
 
     fun defineMediaPlayerStatePreparedAsDefault() {
@@ -100,6 +85,23 @@ class AudioPlayerViewModel(
         timerJob?.cancel()
         listenerPlayerStateJob?.cancel()
         mediaPlayerInteractor.releasePlayer()
+    }
+
+    fun startListenerPlayerStateJob() {
+        playerStateLiveData.value = mediaPlayerInteractor.playerState()
+        listenerPlayerStateJob = viewModelScope.launch {
+            while (true) {
+                delay(REFRESH_TIMER_MILLIS)
+                when (mediaPlayerInteractor.playerState()) {
+                    is MediaPlayerState.Prepared.OnCompletion -> {
+                        timerJob?.cancel()
+                    }
+
+                    else -> Unit
+                }
+                playerStateLiveData.value = mediaPlayerInteractor.playerState()
+            }
+        }
     }
 
     companion object {
