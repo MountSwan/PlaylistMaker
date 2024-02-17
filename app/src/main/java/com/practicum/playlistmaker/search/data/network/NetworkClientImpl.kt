@@ -8,13 +8,15 @@ import com.practicum.playlistmaker.search.data.models.TrackDto
 import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 import com.practicum.playlistmaker.search.domain.models.SearchState
 import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class NetworkClientImpl(private val iTunesService: ITunesApi, private val context: Context) :
     NetworkClient {
 
     private var networkRequestState: NetworkRequestState = NetworkRequestState.Default
 
-    override fun doRequest(
+    override suspend fun doRequest(
         searchRequest: String,
         searchState: SearchState,
         tracks: ArrayList<Track>,
@@ -28,17 +30,21 @@ class NetworkClientImpl(private val iTunesService: ITunesApi, private val contex
             return networkRequestState
         }
 
-        val response = iTunesService.search(searchRequest).execute()
+        return withContext(Dispatchers.IO) {
 
-        if (response.code() == EXECUTED_REQUEST) {
-            tracks.clear()
-            networkRequestState = NetworkRequestState.OnResponse.ExecutedRequest
-            tracksResponse.addAll(response.body()?.results!!)
-            return networkRequestState
-        } else {
-            networkRequestState = NetworkRequestState.OnResponse.IsNotExecutedRequest
-            return networkRequestState
+                val response = iTunesService.search(searchRequest)
+                try {
+                    tracks.clear()
+                    networkRequestState = NetworkRequestState.OnResponse.ExecutedRequest
+                    tracksResponse.addAll(response.results)
+                    return@withContext networkRequestState
+                } catch (e: Throwable) {
+                    networkRequestState = NetworkRequestState.OnResponse.IsNotExecutedRequest
+                    return@withContext networkRequestState
+
+            }
         }
+
     }
 
     private fun isConnected(): Boolean {
@@ -55,10 +61,6 @@ class NetworkClientImpl(private val iTunesService: ITunesApi, private val contex
             }
         }
         return false
-    }
-
-    companion object {
-        private const val EXECUTED_REQUEST = 200
     }
 
 }

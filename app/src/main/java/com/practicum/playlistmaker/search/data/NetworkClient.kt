@@ -7,7 +7,7 @@ import com.practicum.playlistmaker.search.domain.models.Track
 
 interface NetworkClient {
 
-    fun doRequest(
+    suspend fun doRequest(
         searchRequest: String, searchState: SearchState,
         tracks: ArrayList<Track>, tracksResponse: ArrayList<TrackDto>
     ) : NetworkRequestState

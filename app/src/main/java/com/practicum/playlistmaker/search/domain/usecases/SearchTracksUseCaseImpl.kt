@@ -5,6 +5,7 @@ import com.practicum.playlistmaker.search.domain.TracksRepository
 import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 import com.practicum.playlistmaker.search.domain.models.SearchState
 import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
 
 class SearchTracksUseCaseImpl(private val tracksRepository: TracksRepository) :
     SearchTracksUseCase {
@@ -12,7 +13,7 @@ class SearchTracksUseCaseImpl(private val tracksRepository: TracksRepository) :
         searchRequest: String,
         searchState: SearchState,
         tracks: ArrayList<Track>
-    ): NetworkRequestState {
+    ): Flow<NetworkRequestState> {
         return tracksRepository.searchTracks(
             searchRequest = searchRequest,
             searchState = searchState,

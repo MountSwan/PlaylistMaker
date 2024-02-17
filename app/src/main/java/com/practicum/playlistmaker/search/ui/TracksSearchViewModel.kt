@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.search.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.search.domain.AddInHistoryUseCase
 import com.practicum.playlistmaker.search.domain.ClearHistoryUseCase
@@ -12,6 +13,7 @@ import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 import com.practicum.playlistmaker.search.domain.models.SearchState
 import com.practicum.playlistmaker.search.domain.models.ShowMessage
 import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.launch
 
 class TracksSearchViewModel(
     private val searchTracks: SearchTracksUseCase,
@@ -80,18 +82,20 @@ class TracksSearchViewModel(
         searchState.progressBarIsVisible = true
         searchStateLiveData.value = searchState
 
-        val t = Thread {
-            executeRequestResult(
-                networkRequestState = searchTracks.execute(
-                    searchRequest = searchRequest,
-                    searchState = searchState,
-                    tracks = tracks
-                ),
-                nothingFoundMessage = nothingFoundMessage,
-                somethingWentWrongMessage = somethingWentWrongMessage
+        viewModelScope.launch {
+            searchTracks.execute(
+                searchRequest = searchRequest,
+                searchState = searchState,
+                tracks = tracks
             )
+                .collect {
+                    executeRequestResult(
+                        networkRequestState = it,
+                        nothingFoundMessage = nothingFoundMessage,
+                        somethingWentWrongMessage = somethingWentWrongMessage
+                    )
+                }
         }
-        t.start()
 
     }
 

@@ -32,6 +32,8 @@ class AudioPlayerActivity : AppCompatActivity() {
             finish()
         }
 
+        viewModel.startListenerPlayerStateJob()
+
         viewModel.observeSavedTrack().observe(this) {
             drawScreen(it)
         }
@@ -84,6 +86,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         when (mediaPlayerState) {
             is MediaPlayerState.Prepared.OnPrepared -> {
                 binding.controlPlay.isEnabled = true
+                binding.timePlayTrack.text = "00:00"
                 viewModel.defineMediaPlayerStatePreparedAsDefault()
             }
 
