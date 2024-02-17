@@ -6,7 +6,10 @@ import com.practicum.playlistmaker.HISTORY_SEARCH_KEY
 import com.practicum.playlistmaker.search.data.SearchHistory
 import com.practicum.playlistmaker.search.domain.models.Track
 
-class SearchHistoryImpl(private val sharedPrefs: SharedPreferences, private val gson: Gson) :
+class SearchHistoryImpl(
+    private val sharedPrefs: SharedPreferences,
+    private val gson: Gson,
+) :
     SearchHistory {
 
     private val maxNumberTracksInSearchHistory = 10
@@ -20,6 +23,7 @@ class SearchHistoryImpl(private val sharedPrefs: SharedPreferences, private val 
         if (historyInSharedPrefs != null) {
             val tracksFromSharedPrefs =
                 gson.fromJson(historyInSharedPrefs, Array<Track>::class.java)
+            tracksInHistory.clear()
             tracksInHistory.addAll(tracksFromSharedPrefs)
         }
 

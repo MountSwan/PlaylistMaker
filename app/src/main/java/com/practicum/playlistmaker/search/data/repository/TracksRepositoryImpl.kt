@@ -9,7 +9,9 @@ import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRepository {
+class TracksRepositoryImpl(
+    private val networkClient: NetworkClient,
+) : TracksRepository {
 
     private val tracksResponse = ArrayList<TrackDto>()
 
@@ -34,7 +36,7 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
                     releaseDate = it.releaseDate,
                     primaryGenreName = it.primaryGenreName,
                     country = it.country,
-                    previewUrl = it.previewUrl
+                    previewUrl = it.previewUrl,
                 )
             })
 

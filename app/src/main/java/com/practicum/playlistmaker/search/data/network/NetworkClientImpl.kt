@@ -22,6 +22,7 @@ class NetworkClientImpl(private val iTunesService: ITunesApi, private val contex
         tracks: ArrayList<Track>,
         tracksResponse: ArrayList<TrackDto>
     ): NetworkRequestState {
+
         networkRequestState = NetworkRequestState.Default
         tracksResponse.clear()
 
@@ -31,17 +32,15 @@ class NetworkClientImpl(private val iTunesService: ITunesApi, private val contex
         }
 
         return withContext(Dispatchers.IO) {
-
+            try {
                 val response = iTunesService.search(searchRequest)
-                try {
-                    tracks.clear()
-                    networkRequestState = NetworkRequestState.OnResponse.ExecutedRequest
-                    tracksResponse.addAll(response.results)
-                    return@withContext networkRequestState
-                } catch (e: Throwable) {
-                    networkRequestState = NetworkRequestState.OnResponse.IsNotExecutedRequest
-                    return@withContext networkRequestState
-
+                tracks.clear()
+                networkRequestState = NetworkRequestState.OnResponse.ExecutedRequest
+                tracksResponse.addAll(response.results)
+                return@withContext networkRequestState
+            } catch (e: Throwable) {
+                networkRequestState = NetworkRequestState.OnResponse.IsNotExecutedRequest
+                return@withContext networkRequestState
             }
         }
 

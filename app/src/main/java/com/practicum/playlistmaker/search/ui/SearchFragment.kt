@@ -28,7 +28,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class SearchFragment : Fragment() {
 
     companion object {
-        private const val SCREEN_IS_ROTATE = "SCREEN_IS_ROTATE"
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
@@ -78,9 +77,7 @@ class SearchFragment : Fragment() {
             adapter.tracks = it
         }
 
-        if (savedInstanceState == null) {
-            viewModel.getTracksInHistoryFromSharedPrefs()
-        }
+        viewModel.getTracksInHistoryFromSharedPrefs()
 
         viewModel.observeTracksInHistory().observe(viewLifecycleOwner) {
             adapterHistory.tracks = it
@@ -176,11 +173,6 @@ class SearchFragment : Fragment() {
 
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(SCREEN_IS_ROTATE, true)
-    }
-
     override fun onPause() {
         super.onPause()
         searchJob?.cancel()
@@ -215,24 +207,29 @@ class SearchFragment : Fragment() {
     }
 
     private fun startAudioPlayer(track: Track) {
-        val trackUi = TrackUi(
-            trackId = track.trackId,
-            trackName = track.trackName,
-            artistName = track.artistName,
-            trackTimeMillis = track.trackTimeMillis,
-            trackTime = track.trackTime,
-            artworkUrl100 = track.artworkUrl100,
-            artworkUrl512 = track.artworkUrl512,
-            collectionName = track.collectionName,
-            releaseDate = track.releaseDate,
-            primaryGenreName = track.primaryGenreName,
-            country = track.country,
-            previewUrl = track.previewUrl
-        )
-        val audioPlayerIntent = Intent(requireContext(), AudioPlayerActivity::class.java).apply {
-            putExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, trackUi)
+        lifecycleScope.launch {
+            val trackUi = TrackUi(
+                trackId = track.trackId,
+                trackName = track.trackName,
+                artistName = track.artistName,
+                trackTimeMillis = track.trackTimeMillis,
+                trackTime = track.trackTime,
+                artworkUrl100 = track.artworkUrl100,
+                artworkUrl512 = track.artworkUrl512,
+                collectionName = track.collectionName,
+                releaseDate = track.releaseDate,
+                primaryGenreName = track.primaryGenreName,
+                country = track.country,
+                previewUrl = track.previewUrl,
+                isFavorite = viewModel.checkIsFavorite(track.trackId)
+            )
+            val audioPlayerIntent =
+                Intent(requireContext(), AudioPlayerActivity::class.java).apply {
+                    putExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, trackUi)
+                }
+            startActivity(audioPlayerIntent)
         }
-        startActivity(audioPlayerIntent)
+
     }
 
     private fun hideAllExceptHistory() {

@@ -1,10 +1,12 @@
-package com.practicum.playlistmaker.search.ui.models
+package com.practicum.playlistmaker.library.data.db.entity
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Parcelize
-data class TrackUi(
+@Entity(tableName = "favorite_track_table")
+data class FavoriteTrackEntity(
+    @PrimaryKey
+    var dataBaseId: Int?,
     var trackId: Long?,
     var trackName: String?,
     var artistName: String?,
@@ -18,4 +20,4 @@ data class TrackUi(
     var country: String?,
     var previewUrl: String?,
     var isFavorite: Boolean?,
-) : Parcelable
+)

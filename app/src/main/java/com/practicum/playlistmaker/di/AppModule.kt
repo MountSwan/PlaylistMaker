@@ -7,7 +7,6 @@ import com.practicum.playlistmaker.player.ui.AudioPlayerViewModel
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.ui.TracksSearchViewModel
 import com.practicum.playlistmaker.settings.ui.SettingsViewModel
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -19,6 +18,7 @@ val appModule = module {
             getTracksFromSharedPrefs = get(),
             addInHistory = get(),
             clearHistory = get(),
+            favoriteTrackInteractor = get(),
         )
     }
 
@@ -27,7 +27,7 @@ val appModule = module {
     }
 
     viewModel {
-        FavoriteTracksViewModel()
+        FavoriteTracksViewModel(favoriteTrackInteractor = get())
     }
 
     viewModel {
@@ -38,6 +38,7 @@ val appModule = module {
         AudioPlayerViewModel(
             savedTrack = savedTrack,
             mediaPlayerInteractor = get(),
+            favoriteTrackInteractor = get(),
         )
     }
 
