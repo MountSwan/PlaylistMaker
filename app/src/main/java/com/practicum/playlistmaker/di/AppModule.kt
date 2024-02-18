@@ -18,7 +18,6 @@ val appModule = module {
             getTracksFromSharedPrefs = get(),
             addInHistory = get(),
             clearHistory = get(),
-            favoriteTrackInteractor = get(),
         )
     }
 

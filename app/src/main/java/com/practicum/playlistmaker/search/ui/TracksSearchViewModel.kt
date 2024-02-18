@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.library.domain.db.FavoriteTrackInteractor
 import com.practicum.playlistmaker.search.domain.AddInHistoryUseCase
 import com.practicum.playlistmaker.search.domain.ClearHistoryUseCase
 import com.practicum.playlistmaker.search.domain.GetTracksFromSharedPrefsUseCase
@@ -21,7 +20,6 @@ class TracksSearchViewModel(
     private val getTracksFromSharedPrefs: GetTracksFromSharedPrefsUseCase,
     private val addInHistory: AddInHistoryUseCase,
     private val clearHistory: ClearHistoryUseCase,
-    private val favoriteTrackInteractor: FavoriteTrackInteractor
 ) : ViewModel() {
 
     private val showMessage = ShowMessage(
@@ -64,7 +62,7 @@ class TracksSearchViewModel(
     fun observeShowMessage(): LiveData<ShowMessage> = showMessageLiveData
 
     fun getTracksInHistoryFromSharedPrefs() {
-        getTracksFromSharedPrefs.execute(tracksInHistory)
+        viewModelScope.launch { getTracksFromSharedPrefs.execute(tracksInHistory) }
         searchState.tracksInHistorySize = tracksInHistory.size
         tracksInHistoryLiveData.value = tracksInHistory
     }
@@ -119,10 +117,6 @@ class TracksSearchViewModel(
         showMessage.text = text
         showMessage.image = image
         showMessageLiveData.postValue(showMessage)
-    }
-
-    suspend fun checkIsFavorite(trackID: Long?): Boolean {
-        return favoriteTrackInteractor.checkIsFavorite(trackID)
     }
 
     private fun executeRequestResult(

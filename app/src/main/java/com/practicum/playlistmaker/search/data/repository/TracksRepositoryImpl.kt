@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.search.data.repository
 
+import com.practicum.playlistmaker.library.data.db.AppDatabase
 import com.practicum.playlistmaker.search.data.NetworkClient
 import com.practicum.playlistmaker.search.data.models.TrackDto
 import com.practicum.playlistmaker.search.domain.TracksRepository
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.flow
 
 class TracksRepositoryImpl(
     private val networkClient: NetworkClient,
+    private val appDatabase: AppDatabase,
 ) : TracksRepository {
 
     private val tracksResponse = ArrayList<TrackDto>()
@@ -37,12 +39,19 @@ class TracksRepositoryImpl(
                     primaryGenreName = it.primaryGenreName,
                     country = it.country,
                     previewUrl = it.previewUrl,
+                    isFavorite = checkIsFavorite(it.trackId)
                 )
             })
 
             searchState.responseResultsIsNotEmpty = true
         }
         emit(networkRequestState)
+    }
+
+    private suspend fun checkIsFavorite(trackId: Long?): Boolean {
+        appDatabase.favoriteTrackDao().getFavoriteTracksId()
+            .forEach { favoriteTrackId -> if (favoriteTrackId == trackId) return true }
+        return false
     }
 
 }

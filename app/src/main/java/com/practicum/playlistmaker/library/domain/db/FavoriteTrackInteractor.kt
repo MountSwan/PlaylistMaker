@@ -11,6 +11,4 @@ interface FavoriteTrackInteractor {
 
     fun getFavoriteTracks(): Flow<ArrayList<Track>>
 
-    suspend fun checkIsFavorite(trackID: Long?): Boolean
-
 }

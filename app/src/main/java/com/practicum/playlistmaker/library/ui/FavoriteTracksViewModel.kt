@@ -31,8 +31,4 @@ class FavoriteTracksViewModel(private val favoriteTrackInteractor: FavoriteTrack
         }
     }
 
-    suspend fun checkIsFavorite(trackID: Long?): Boolean {
-        return favoriteTrackInteractor.checkIsFavorite(trackID)
-    }
-
 }

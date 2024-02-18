@@ -117,7 +117,6 @@ class FavoriteTracksFragment : Fragment() {
     }
 
     private fun startAudioPlayer(track: Track) {
-        lifecycleScope.launch {
             val trackUi = TrackUi(
                 trackId = track.trackId,
                 trackName = track.trackName,
@@ -131,15 +130,13 @@ class FavoriteTracksFragment : Fragment() {
                 primaryGenreName = track.primaryGenreName,
                 country = track.country,
                 previewUrl = track.previewUrl,
-                isFavorite = favoriteTracksViewModel.checkIsFavorite(track.trackId)
+                isFavorite = track.isFavorite,
             )
             val audioPlayerIntent =
                 Intent(requireContext(), AudioPlayerActivity::class.java).apply {
                     putExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, trackUi)
                 }
             startActivity(audioPlayerIntent)
-        }
-
     }
 
 }

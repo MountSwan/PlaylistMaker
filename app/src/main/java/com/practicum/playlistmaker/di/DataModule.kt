@@ -51,7 +51,7 @@ val dataModule = module {
     }
 
     single<SearchHistory> {
-        SearchHistoryImpl(get(), get())
+        SearchHistoryImpl(get(), get(), get())
     }
 
     single<SearchHistoryRepository> {
@@ -59,7 +59,7 @@ val dataModule = module {
     }
 
     single<TracksRepository> {
-        TracksRepositoryImpl(get())
+        TracksRepositoryImpl(get(), get())
     }
 
     single<AudioPlayer> {

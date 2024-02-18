@@ -12,7 +12,7 @@ class FavoriteTrackRepositoryImpl(
     private val favoriteTrackDbConvertor: FavoriteTrackDbConvertor
 ) : FavoriteTrackRepository {
 
-    override suspend fun insertFavoriteTrack(track: Track?) {
+    override suspend fun insertFavoriteTrack(track: Track) {
         val insertingTrack = favoriteTrackDbConvertor.map(track)
         appDatabase.favoriteTrackDao().insertFavoriteTrack(insertingTrack)
     }
@@ -27,12 +27,6 @@ class FavoriteTrackRepositoryImpl(
         val tracks = appDatabase.favoriteTrackDao().getFavoriteTracks()
         favoriteTracks.addAll(convertFromFavoriteTrackEntity(tracks))
         emit(favoriteTracks)
-    }
-
-    override suspend fun checkIsFavorite(trackID: Long?): Boolean {
-        appDatabase.favoriteTrackDao().getFavoriteTracksId()
-            .forEach { favoriteTrackId -> if (favoriteTrackId == trackID) return true }
-        return false
     }
 
     private fun convertFromFavoriteTrackEntity(tracks: List<FavoriteTrackEntity>): List<Track> {

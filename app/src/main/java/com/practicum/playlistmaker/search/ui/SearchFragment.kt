@@ -36,6 +36,8 @@ class SearchFragment : Fragment() {
 
     private var searchJob: Job? = null
 
+    private var onPause: Boolean = false
+
     private val adapter = TrackAdapter {
         if (clickDebounce()) {
             addInHistory(it)
@@ -70,14 +72,16 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        onPause = false
+
+        viewModel.getTracksInHistoryFromSharedPrefs()
+
         inputMethodManager =
             requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
 
         viewModel.observeTracks().observe(viewLifecycleOwner) {
             adapter.tracks = it
         }
-
-        viewModel.getTracksInHistoryFromSharedPrefs()
 
         viewModel.observeTracksInHistory().observe(viewLifecycleOwner) {
             adapterHistory.tracks = it
@@ -176,6 +180,15 @@ class SearchFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         searchJob?.cancel()
+        onPause = true
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (onPause) {
+            viewModel.getTracksInHistoryFromSharedPrefs()
+            searchDebounce()
+        }
     }
 
     override fun onDestroyView() {
@@ -207,7 +220,6 @@ class SearchFragment : Fragment() {
     }
 
     private fun startAudioPlayer(track: Track) {
-        lifecycleScope.launch {
             val trackUi = TrackUi(
                 trackId = track.trackId,
                 trackName = track.trackName,
@@ -221,14 +233,13 @@ class SearchFragment : Fragment() {
                 primaryGenreName = track.primaryGenreName,
                 country = track.country,
                 previewUrl = track.previewUrl,
-                isFavorite = viewModel.checkIsFavorite(track.trackId)
+                isFavorite = track.isFavorite,
             )
             val audioPlayerIntent =
                 Intent(requireContext(), AudioPlayerActivity::class.java).apply {
                     putExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, trackUi)
                 }
             startActivity(audioPlayerIntent)
-        }
 
     }
 
