@@ -4,8 +4,9 @@ import com.practicum.playlistmaker.search.data.SearchHistory
 import com.practicum.playlistmaker.search.domain.SearchHistoryRepository
 import com.practicum.playlistmaker.search.domain.models.Track
 
-class SearchHistoryRepositoryImpl(private val searchHistory: SearchHistory): SearchHistoryRepository {
-    override fun getTracksFromSharedPrefs(tracksInHistory: ArrayList<Track>) {
+class SearchHistoryRepositoryImpl(private val searchHistory: SearchHistory) :
+    SearchHistoryRepository {
+    override suspend fun getTracksFromSharedPrefs(tracksInHistory: ArrayList<Track>) {
         searchHistory.getTracksFromSharedPrefs(tracksInHistory)
     }
 

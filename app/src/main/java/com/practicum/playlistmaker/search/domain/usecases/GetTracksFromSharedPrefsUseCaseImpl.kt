@@ -6,7 +6,7 @@ import com.practicum.playlistmaker.search.domain.models.Track
 
 class GetTracksFromSharedPrefsUseCaseImpl(private val searchHistory: SearchHistoryRepository) :
     GetTracksFromSharedPrefsUseCase {
-    override fun execute(tracksInHistory: ArrayList<Track>) {
+    override suspend fun execute(tracksInHistory: ArrayList<Track>) {
         searchHistory.getTracksFromSharedPrefs(tracksInHistory)
     }
 }

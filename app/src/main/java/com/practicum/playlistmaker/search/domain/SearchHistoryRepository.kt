@@ -4,7 +4,7 @@ import com.practicum.playlistmaker.search.domain.models.Track
 
 interface SearchHistoryRepository {
 
-    fun getTracksFromSharedPrefs(tracksInHistory: ArrayList<Track>)
+    suspend fun getTracksFromSharedPrefs(tracksInHistory: ArrayList<Track>)
 
     fun addInHistory(
         track: Track,

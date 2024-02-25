@@ -62,7 +62,7 @@ class TracksSearchViewModel(
     fun observeShowMessage(): LiveData<ShowMessage> = showMessageLiveData
 
     fun getTracksInHistoryFromSharedPrefs() {
-        getTracksFromSharedPrefs.execute(tracksInHistory)
+        viewModelScope.launch { getTracksFromSharedPrefs.execute(tracksInHistory) }
         searchState.tracksInHistorySize = tracksInHistory.size
         tracksInHistoryLiveData.value = tracksInHistory
     }

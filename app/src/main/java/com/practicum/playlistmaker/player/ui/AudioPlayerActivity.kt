@@ -52,6 +52,10 @@ class AudioPlayerActivity : AppCompatActivity() {
             viewModel.playbackControl()
         }
 
+        binding.addToFavorites.setOnClickListener {
+            viewModel.onFavoriteClicked()
+        }
+
     }
 
     override fun onPause() {
@@ -80,6 +84,11 @@ class AudioPlayerActivity : AppCompatActivity() {
         binding.year.text = savedTrack?.releaseDate?.take(FIRST_FOUR_CHARACTERS)
         binding.genre.text = savedTrack?.primaryGenreName
         binding.country.text = savedTrack?.country
+        if (savedTrack?.isFavorite == true) {
+            binding.addToFavorites.setImageResource(R.drawable.is_favorite)
+        } else {
+            binding.addToFavorites.setImageResource(R.drawable.is_not_favorite)
+        }
     }
 
     private fun displayPlayer(mediaPlayerState: MediaPlayerState) {
@@ -130,7 +139,8 @@ class AudioPlayerActivity : AppCompatActivity() {
                 releaseDate = it.releaseDate,
                 primaryGenreName = it.primaryGenreName,
                 country = it.country,
-                previewUrl = it.previewUrl
+                previewUrl = it.previewUrl,
+                isFavorite = it.isFavorite,
             )
         }
 

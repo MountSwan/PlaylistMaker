@@ -3,7 +3,12 @@ package com.practicum.playlistmaker.di
 import android.content.Context
 import android.content.SharedPreferences
 import android.media.MediaPlayer
+import androidx.room.Room
 import com.google.gson.Gson
+import com.practicum.playlistmaker.library.data.db.AppDatabase
+import com.practicum.playlistmaker.library.data.db.FavoriteTrackRepositoryImpl
+import com.practicum.playlistmaker.library.data.db.converters.FavoriteTrackDbConvertor
+import com.practicum.playlistmaker.library.domain.db.FavoriteTrackRepository
 import com.practicum.playlistmaker.player.data.AudioPlayerImpl
 import com.practicum.playlistmaker.player.domain.AudioPlayer
 import com.practicum.playlistmaker.search.data.NetworkClient
@@ -46,7 +51,7 @@ val dataModule = module {
     }
 
     single<SearchHistory> {
-        SearchHistoryImpl(get(), get())
+        SearchHistoryImpl(get(), get(), get())
     }
 
     single<SearchHistoryRepository> {
@@ -54,7 +59,7 @@ val dataModule = module {
     }
 
     single<TracksRepository> {
-        TracksRepositoryImpl(get())
+        TracksRepositoryImpl(get(), get())
     }
 
     single<AudioPlayer> {
@@ -71,4 +76,15 @@ val dataModule = module {
         ExternalNavigatorImpl(androidContext())
     }
 
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    factory { FavoriteTrackDbConvertor() }
+
+    single<FavoriteTrackRepository> {
+        FavoriteTrackRepositoryImpl(get(), get())
+    }
 }

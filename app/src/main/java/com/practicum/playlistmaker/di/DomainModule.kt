@@ -1,5 +1,7 @@
 package com.practicum.playlistmaker.di
 
+import com.practicum.playlistmaker.library.domain.db.FavoriteTrackInteractor
+import com.practicum.playlistmaker.library.domain.db.FavoriteTrackInteractorImpl
 import com.practicum.playlistmaker.player.domain.MediaPlayerInteractor
 import com.practicum.playlistmaker.player.domain.MediaPlayerInteractorImpl
 import com.practicum.playlistmaker.search.domain.AddInHistoryUseCase
@@ -56,6 +58,10 @@ val domainModule = module {
 
     factory<ReadUserAgreementUseCase> {
         ReadUserAgreementUseCaseImpl(get())
+    }
+
+    factory<FavoriteTrackInteractor> {
+        FavoriteTrackInteractorImpl(get())
     }
 
 }
