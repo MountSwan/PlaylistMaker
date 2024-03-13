@@ -30,4 +30,10 @@
     <string name="no_playlist" translatable="false">Вы не создали\nни одного плейлиста</string>
     <string name="favorite_tracks" translatable="false">Избранные треки</string>
     <string name="playlists" translatable="false">Плейлисты</string>
+    <string name="playlist_name" translatable="false">Название*</string>
+    <string name="playlist_description" translatable="false">Описание</string>
+    <string name="create_playlist" translatable="false">Создать</string>
+    <string name="add_to_playlist" translatable="false">Добавить в плейлист</string>
+    <string name="add_to_playlist_true" translatable="false">Добавлено в плейлист</string>
+    <string name="add_to_playlist_false" translatable="false">Трек уже добавлен в плейлист</string>
 </resources>

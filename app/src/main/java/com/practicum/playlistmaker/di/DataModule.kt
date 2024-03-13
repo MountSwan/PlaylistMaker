@@ -7,8 +7,12 @@ import androidx.room.Room
 import com.google.gson.Gson
 import com.practicum.playlistmaker.library.data.db.AppDatabase
 import com.practicum.playlistmaker.library.data.db.FavoriteTrackRepositoryImpl
+import com.practicum.playlistmaker.library.data.db.PlaylistRepositoryImpl
 import com.practicum.playlistmaker.library.data.db.converters.FavoriteTrackDbConvertor
+import com.practicum.playlistmaker.library.data.db.converters.PlaylistDbConvertor
+import com.practicum.playlistmaker.library.data.db.converters.TrackInPlaylistDbConvertor
 import com.practicum.playlistmaker.library.domain.db.FavoriteTrackRepository
+import com.practicum.playlistmaker.library.domain.db.PlaylistRepository
 import com.practicum.playlistmaker.player.data.AudioPlayerImpl
 import com.practicum.playlistmaker.player.domain.AudioPlayer
 import com.practicum.playlistmaker.search.data.NetworkClient
@@ -84,7 +88,15 @@ val dataModule = module {
 
     factory { FavoriteTrackDbConvertor() }
 
+    factory { TrackInPlaylistDbConvertor() }
+
     single<FavoriteTrackRepository> {
         FavoriteTrackRepositoryImpl(get(), get())
+    }
+
+    factory { PlaylistDbConvertor() }
+
+    single<PlaylistRepository> {
+        PlaylistRepositoryImpl(get(), get(), get(), get())
     }
 }

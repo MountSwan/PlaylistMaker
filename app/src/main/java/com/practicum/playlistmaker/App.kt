@@ -3,6 +3,7 @@ package com.practicum.playlistmaker
 import android.app.Application
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
+import com.markodevcic.peko.PermissionRequester
 import com.practicum.playlistmaker.di.appModule
 import com.practicum.playlistmaker.di.dataModule
 import com.practicum.playlistmaker.di.domainModule
@@ -13,7 +14,6 @@ const val PRACTICUM_EXAMPLE_PREFERENCES = "practicum_example_preferences"
 const val FIRST_TIME_RUN_APP_KEY = "key_for_first_time_run_app"
 const val DARK_THEME_STATE_KEY = "key_for_dark_theme_state"
 const val HISTORY_SEARCH_KEY = "key_for_history_search"
-const val SAVE_TRACK_FOR_AUDIO_PLAYER_KEY = "key_for_save_track_for_audio_player"
 
 class App : Application() {
 
@@ -26,6 +26,8 @@ class App : Application() {
             androidContext(this@App)
             modules(listOf(appModule, dataModule, domainModule))
         }
+
+        PermissionRequester.initialize(applicationContext)
 
         val sharedPrefs = getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE)
 
