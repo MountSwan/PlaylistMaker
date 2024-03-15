@@ -29,17 +29,17 @@ class PlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private fun defineEnd(number: Int): String {
         return if (number < 10) {
             when (number) {
-                1 -> "трек"
-                2, 3, 4 -> "трека"
-                else -> "треков"
+                1 -> itemView.context.getString(R.string.track)
+                2, 3, 4 -> itemView.context.getString(R.string.of_track)
+                else -> itemView.context.getString(R.string.of_tracks)
             }
         } else if (number.toString()[number.toString().length - 2].digitToInt() == 1) {
-            "треков"
+            itemView.context.getString(R.string.of_tracks)
         } else {
             when (number.toString().last().digitToInt()) {
-                1 -> "трек"
-                2, 3, 4 -> "трека"
-                else -> "треков"
+                1 -> itemView.context.getString(R.string.track)
+                2, 3, 4 -> itemView.context.getString(R.string.of_track)
+                else -> itemView.context.getString(R.string.of_tracks)
             }
         }
 

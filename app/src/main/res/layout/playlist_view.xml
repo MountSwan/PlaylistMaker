@@ -29,7 +29,7 @@
         android:maxLines="1"
         android:ellipsize="end"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="Название плейлиста" />
+        tools:text="@string/playlist_name" />
 
     <TextView
         android:id="@+id/tracksNumber"
@@ -44,6 +44,6 @@
         android:ellipsize="end"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/playlistName"
-        tools:text="число треков в плейлисте" />
+        tools:text="@string/playlists_tracks_number" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

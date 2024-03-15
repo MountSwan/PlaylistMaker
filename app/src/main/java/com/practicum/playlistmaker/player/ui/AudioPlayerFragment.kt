@@ -3,7 +3,6 @@ package com.practicum.playlistmaker.player.ui
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -158,7 +157,7 @@ class AudioPlayerFragment : Fragment() {
 
         binding.addToPlaylist.setOnClickListener {
             viewModel.getPlaylistsFromDatabase()
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         }
 
         binding.newPlaylistButton.setOnClickListener {
@@ -272,9 +271,7 @@ class AudioPlayerFragment : Fragment() {
     private fun getCoverImage(playlistName: String): File {
         val filePath =
             File(requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myalbum")
-        val file = File(filePath, "${playlistName}_cover.jpg")
-        Log.e("AAA", "${playlistName}_cover.jpg = $file")
-        return file
+        return File(filePath, "${playlistName}_cover.jpg")
     }
 
     private fun clickDebounce(): Boolean {

@@ -207,11 +207,12 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View android:id="@+id/overlay"
+    <View
+        android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#99000000"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/standard_bottom_sheet"
@@ -246,18 +247,19 @@
             android:textSize="@dimen/nineteen_size_text"
             android:textStyle="bold" />
 
-        <Button
+        <TextView
             android:id="@+id/newPlaylistButton"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/nine_space"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/four_space"
-            android:backgroundTint="@color/text_color"
+            android:background="@drawable/button_shape"
             android:fontFamily="@font/ys_display_medium"
+            android:gravity="center"
             android:text="@string/new_playlist"
             android:textColor="@color/background_activity_settings"
-            android:textSize="@dimen/sixteen_size_text"
-            app:cornerRadius="@dimen/two_space" />
+            android:textSize="@dimen/fourteen_size_text" />
+
 
         <FrameLayout
             android:layout_width="match_parent"

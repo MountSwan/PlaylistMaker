@@ -2,7 +2,6 @@ package com.practicum.playlistmaker.library.ui
 
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -92,9 +91,7 @@ class PlaylistsFragment : Fragment() {
     private fun getCoverImage(playlistName: String): File {
         val filePath =
             File(requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myalbum")
-        val file = File(filePath, "${playlistName}_cover.jpg")
-        Log.e("AAA", "${playlistName}_cover.jpg = $file")
-        return file
+        return File(filePath, "${playlistName}_cover.jpg")
     }
 
 }

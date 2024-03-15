@@ -26,14 +26,27 @@
     <string name="collection" translatable="false">Альбом</string>
     <string name="time_play_track" translatable="false">00:00</string>
     <string name="new_playlist" translatable="false">Новый плейлист</string>
+    <string name="new_playlist_is_created" translatable="false">Новый плейлист создан</string>
     <string name="empty_library" translatable="false">Ваша медиатека пуста</string>
     <string name="no_playlist" translatable="false">Вы не создали\nни одного плейлиста</string>
     <string name="favorite_tracks" translatable="false">Избранные треки</string>
     <string name="playlists" translatable="false">Плейлисты</string>
-    <string name="playlist_name" translatable="false">Название*</string>
+    <string name="name" translatable="false">Название*</string>
+    <string name="playlist_name" translatable="false">Название плейлиста</string>
+    <string name="playlists_tracks_number" translatable="false">Число треков в плейлисте</string>
     <string name="playlist_description" translatable="false">Описание</string>
     <string name="create_playlist" translatable="false">Создать</string>
     <string name="add_to_playlist" translatable="false">Добавить в плейлист</string>
     <string name="add_to_playlist_true" translatable="false">Добавлено в плейлист</string>
     <string name="add_to_playlist_false" translatable="false">Трек уже добавлен в плейлист</string>
+    <string name="no_media_selected" translatable="false">No media selected</string>
+    <string name="choose_camera_permission" translatable="false">Выберите в разрешениях (Permissions) доступ к CAMERA</string>
+    <string name="permission_is_necessary" translatable="false">Разрешение необходимо, чтобы выбрать обложку для плейлиста</string>
+    <string name="finish_creation" translatable="false">Завершить создание плейлиста?</string>
+    <string name="unsaved_data_will_be_lost" translatable="false">Все несохраненные данные будут потеряны</string>
+    <string name="cancel" translatable="false">Отмена</string>
+    <string name="finish" translatable="false">Завершить</string>
+    <string name="track" translatable="false">трек</string>
+    <string name="of_track" translatable="false">трека</string>
+    <string name="of_tracks" translatable="false">треков</string>
 </resources>

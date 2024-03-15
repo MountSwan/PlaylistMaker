@@ -80,10 +80,12 @@ class SearchFragment : Fragment() {
 
         viewModel.observeTracks().observe(viewLifecycleOwner) {
             adapter.tracks = it
+            adapter.notifyDataSetChanged()
         }
 
         viewModel.observeTracksInHistory().observe(viewLifecycleOwner) {
             adapterHistory.tracks = it
+            adapterHistory.notifyDataSetChanged()
             binding.inputEditText.setOnFocusChangeListener { view, hasFocus ->
                 binding.historyOfSearch.isVisible =
                     hasFocus && binding.inputEditText.text.isEmpty() && it.size > 0
