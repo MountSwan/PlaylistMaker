@@ -9,6 +9,7 @@ import com.practicum.playlistmaker.search.domain.AddInHistoryUseCase
 import com.practicum.playlistmaker.search.domain.ClearHistoryUseCase
 import com.practicum.playlistmaker.search.domain.GetTracksFromSharedPrefsUseCase
 import com.practicum.playlistmaker.search.domain.SearchTracksUseCase
+import com.practicum.playlistmaker.search.domain.models.DisplayState
 import com.practicum.playlistmaker.search.domain.models.NetworkRequestState
 import com.practicum.playlistmaker.search.domain.models.SearchState
 import com.practicum.playlistmaker.search.domain.models.ShowMessage
@@ -30,7 +31,7 @@ class TracksSearchViewModel(
     private val searchState = SearchState(
         refreshButtonIsVisible = false,
         recyclerViewIsVisible = false,
-        progressBarIsVisible = true,
+        progressBarIsVisible = false,
         adapterNotifyDataSetChanged = false,
         clearButtonVisibility = false,
         tracksInHistorySize = 0,
@@ -61,10 +62,19 @@ class TracksSearchViewModel(
 
     fun observeShowMessage(): LiveData<ShowMessage> = showMessageLiveData
 
+    private val displayStateLiveData =
+        MutableLiveData<DisplayState>()
+
+    fun observeDisplayState(): LiveData<DisplayState> = displayStateLiveData
+
     fun getTracksInHistoryFromSharedPrefs() {
-        viewModelScope.launch { getTracksFromSharedPrefs.execute(tracksInHistory) }
-        searchState.tracksInHistorySize = tracksInHistory.size
-        tracksInHistoryLiveData.value = tracksInHistory
+        viewModelScope.launch {
+            getTracksFromSharedPrefs.execute(tracksInHistory)
+            searchState.tracksInHistorySize = tracksInHistory.size
+            tracksInHistoryLiveData.postValue(tracksInHistory)
+        }
+        /*searchState.tracksInHistorySize = tracksInHistory.size
+        tracksInHistoryLiveData.value = tracksInHistory*/
     }
 
     fun tracksClear() {
@@ -111,6 +121,15 @@ class TracksSearchViewModel(
 
     fun addInHistory(track: Track) {
         addInHistory.execute(track, tracksInHistory)
+    }
+
+    fun setDisplayState(displayState: DisplayState) {
+        displayStateLiveData.value = displayState
+    }
+
+    fun hideRefreshButton() {
+        searchState.refreshButtonIsVisible = false
+        searchStateLiveData.value = searchState
     }
 
     private fun showMessage(text: String, image: Int) {

@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.di
 
 import com.practicum.playlistmaker.library.ui.FavoriteTracksViewModel
+import com.practicum.playlistmaker.library.ui.NewPlaylistViewModel
 import com.practicum.playlistmaker.library.ui.PlaylistsViewModel
 import com.practicum.playlistmaker.main.ui.MainActivityViewModel
 import com.practicum.playlistmaker.player.ui.AudioPlayerViewModel
@@ -30,14 +31,15 @@ val appModule = module {
     }
 
     viewModel {
-        PlaylistsViewModel()
+        PlaylistsViewModel(get())
     }
 
-    viewModel {(savedTrack: Track) ->
+    viewModel { (savedTrack: Track) ->
         AudioPlayerViewModel(
             savedTrack = savedTrack,
             mediaPlayerInteractor = get(),
             favoriteTrackInteractor = get(),
+            playlistInteractor = get(),
         )
     }
 
@@ -48,6 +50,10 @@ val appModule = module {
             getSupport = get(),
             readUserAgreement = get()
         )
+    }
+
+    viewModel {
+        NewPlaylistViewModel(get())
     }
 
 }

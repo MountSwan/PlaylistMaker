@@ -1,7 +1,6 @@
 package com.practicum.playlistmaker.search.ui
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,11 +12,12 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.SAVE_TRACK_FOR_AUDIO_PLAYER_KEY
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
-import com.practicum.playlistmaker.player.ui.AudioPlayerActivity
+import com.practicum.playlistmaker.player.ui.AudioPlayerFragment
+import com.practicum.playlistmaker.search.domain.models.DisplayState
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.ui.models.TrackUi
 import kotlinx.coroutines.Job
@@ -81,26 +81,86 @@ class SearchFragment : Fragment() {
 
         viewModel.observeTracks().observe(viewLifecycleOwner) {
             adapter.tracks = it
+            adapter.notifyDataSetChanged()
         }
 
         viewModel.observeTracksInHistory().observe(viewLifecycleOwner) {
             adapterHistory.tracks = it
-            binding.inputEditText.setOnFocusChangeListener { view, hasFocus ->
-                binding.historyOfSearch.isVisible =
-                    hasFocus && binding.inputEditText.text.isEmpty() && it.size > 0
+            adapterHistory.notifyDataSetChanged()
+            if (binding.inputEditText.text.isEmpty() && it.size > 0) {
+                viewModel.setDisplayState(DisplayState.SearchHistory)
+            } else if (binding.refreshButton.isVisible) {
+                viewModel.setDisplayState(DisplayState.PlaceholdersWithRefreshButton)
+            } else if (binding.placeholderImage.isVisible) {
+                viewModel.setDisplayState(DisplayState.PlaceholdersWithoutRefreshButton)
+            } else {
+                viewModel.setDisplayState(DisplayState.TracksSearch)
+            }
+        }
+
+        viewModel.observeSearchState().observe(viewLifecycleOwner) {
+            binding.clearIcon.isVisible = it.clearButtonVisibility
+            binding.refreshButton.isVisible = it.refreshButtonIsVisible
+            binding.recyclerView.isVisible = it.recyclerViewIsVisible
+            binding.progressBar.isVisible = it.progressBarIsVisible
+            if (text.isEmpty() && it.tracksInHistorySize > 0) {
+                viewModel.tracksClear()
+                viewModel.setDisplayState(DisplayState.SearchHistory)
+            } else {
+                if (binding.refreshButton.isVisible) {
+                    viewModel.setDisplayState(DisplayState.PlaceholdersWithRefreshButton)
+                } else if (binding.placeholderImage.isVisible) {
+                    viewModel.setDisplayState(DisplayState.PlaceholdersWithoutRefreshButton)
+                } else {
+                    viewModel.setDisplayState(DisplayState.TracksSearch)
+                }
             }
         }
 
         viewModel.observeShowMessage().observe(viewLifecycleOwner) {
             if (it.text.isNotEmpty()) {
-                binding.placeholderMessage.isVisible = true
-                binding.placeholderImage.isVisible = true
-                adapter.notifyDataSetChanged()
+                if (binding.refreshButton.isVisible) {
+                    viewModel.setDisplayState(DisplayState.PlaceholdersWithRefreshButton)
+                } else {
+                    viewModel.setDisplayState(DisplayState.PlaceholdersWithoutRefreshButton)
+                }
                 binding.placeholderMessage.text = it.text
                 binding.placeholderImage.setImageResource(it.image)
             } else {
-                binding.placeholderMessage.isVisible = false
-                binding.placeholderImage.isVisible = false
+                if (binding.historyOfSearch.isVisible) {
+                    viewModel.setDisplayState(DisplayState.SearchHistory)
+                } else {
+                    viewModel.setDisplayState(DisplayState.TracksSearch)
+                }
+            }
+        }
+
+        viewModel.observeDisplayState().observe(viewLifecycleOwner) {
+            when (it) {
+                DisplayState.TracksSearch -> {
+                    binding.historyOfSearch.isVisible = false
+                    binding.placeholderMessage.isVisible = false
+                    binding.placeholderImage.isVisible = false
+                    binding.refreshButton.isVisible = false
+                }
+                DisplayState.SearchHistory -> {
+                    binding.historyOfSearch.isVisible = true
+                    binding.placeholderMessage.isVisible = false
+                    binding.placeholderImage.isVisible = false
+                    binding.refreshButton.isVisible = false
+                }
+                DisplayState.PlaceholdersWithoutRefreshButton -> {
+                    binding.historyOfSearch.isVisible = false
+                    binding.placeholderMessage.isVisible = true
+                    binding.placeholderImage.isVisible = true
+                    binding.refreshButton.isVisible = false
+                }
+                DisplayState.PlaceholdersWithRefreshButton -> {
+                    binding.historyOfSearch.isVisible = false
+                    binding.placeholderMessage.isVisible = true
+                    binding.placeholderImage.isVisible = true
+                    binding.refreshButton.isVisible = true
+                }
             }
         }
 
@@ -115,7 +175,10 @@ class SearchFragment : Fragment() {
         binding.clearIcon.setOnClickListener {
             binding.inputEditText.setText("")
             inputMethodManager?.hideSoftInputFromWindow(binding.inputEditText.windowToken, 0)
-            hideAllExceptHistory()
+            viewModel.tracksClear()
+            binding.placeholderImage.isVisible = false
+            binding.placeholderMessage.isVisible = false
+            viewModel.hideRefreshButton()
         }
 
         val simpleTextWatcher = object : TextWatcher {
@@ -134,17 +197,8 @@ class SearchFragment : Fragment() {
                 before: Int,
                 count: Int
             ) {
-                viewModel.doOnTextChange(textSearch)
-                viewModel.observeSearchState().observe(viewLifecycleOwner) {
-                    binding.clearIcon.isVisible = it.clearButtonVisibility
-                    if (binding.inputEditText.hasFocus() && textSearch?.isEmpty() == true && it.tracksInHistorySize > 0) {
-                        hideAllExceptHistory()
-                        binding.historyOfSearch.isVisible = true
-                    } else {
-                        binding.historyOfSearch.isVisible = false
-                    }
-                }
                 text = textSearch.toString()
+                viewModel.doOnTextChange(textSearch)
                 searchDebounce()
             }
 
@@ -172,7 +226,7 @@ class SearchFragment : Fragment() {
 
         binding.clearHistoryButton.setOnClickListener {
             viewModel.clearHistory()
-            binding.historyOfSearch.isVisible = false
+            viewModel.setDisplayState(DisplayState.TracksSearch)
         }
 
     }
@@ -203,52 +257,34 @@ class SearchFragment : Fragment() {
                 nothingFoundMessage = getString(R.string.nothing_found),
                 somethingWentWrongMessage = getString(R.string.something_went_wrong)
             )
-            viewModel.observeSearchState().observe(viewLifecycleOwner) {
-                binding.refreshButton.isVisible = it.refreshButtonIsVisible
-                binding.recyclerView.isVisible = it.recyclerViewIsVisible
-                binding.progressBar.isVisible = it.progressBarIsVisible
-                if (it.adapterNotifyDataSetChanged) {
-                    adapter.notifyDataSetChanged()
-                }
-            }
         }
     }
 
     private fun addInHistory(track: Track) {
         viewModel.addInHistory(track)
-        adapterHistory.notifyDataSetChanged()
     }
 
     private fun startAudioPlayer(track: Track) {
-            val trackUi = TrackUi(
-                trackId = track.trackId,
-                trackName = track.trackName,
-                artistName = track.artistName,
-                trackTimeMillis = track.trackTimeMillis,
-                trackTime = track.trackTime,
-                artworkUrl100 = track.artworkUrl100,
-                artworkUrl512 = track.artworkUrl512,
-                collectionName = track.collectionName,
-                releaseDate = track.releaseDate,
-                primaryGenreName = track.primaryGenreName,
-                country = track.country,
-                previewUrl = track.previewUrl,
-                isFavorite = track.isFavorite,
-            )
-            val audioPlayerIntent =
-                Intent(requireContext(), AudioPlayerActivity::class.java).apply {
-                    putExtra(SAVE_TRACK_FOR_AUDIO_PLAYER_KEY, trackUi)
-                }
-            startActivity(audioPlayerIntent)
+        val trackUi = TrackUi(
+            trackId = track.trackId,
+            trackName = track.trackName,
+            artistName = track.artistName,
+            trackTimeMillis = track.trackTimeMillis,
+            trackTime = track.trackTime,
+            artworkUrl100 = track.artworkUrl100,
+            artworkUrl512 = track.artworkUrl512,
+            collectionName = track.collectionName,
+            releaseDate = track.releaseDate,
+            primaryGenreName = track.primaryGenreName,
+            country = track.country,
+            previewUrl = track.previewUrl,
+            isFavorite = track.isFavorite,
+        )
 
-    }
-
-    private fun hideAllExceptHistory() {
-        viewModel.tracksClear()
-        adapter.notifyDataSetChanged()
-        binding.placeholderMessage.isVisible = false
-        binding.placeholderImage.isVisible = false
-        binding.refreshButton.isVisible = false
+        findNavController().navigate(
+            R.id.action_searchFragment_to_audioPlayerFragment,
+            AudioPlayerFragment.createArgs(trackUi)
+        )
     }
 
     private fun searchDebounce() {
