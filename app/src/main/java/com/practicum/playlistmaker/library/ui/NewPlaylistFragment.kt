@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,34 +17,42 @@ import androidx.activity.addCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.markodevcic.peko.PermissionRequester
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentNewPlaylistBinding
+import com.practicum.playlistmaker.library.domain.models.Playlist
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import java.io.File
 import java.io.FileOutputStream
 
-class NewPlaylistFragment : Fragment() {
+open class NewPlaylistFragment : Fragment() {
 
     companion object {
         fun newInstance() = NewPlaylistFragment()
         private const val COVER_IS_CHOSEN_KEY = "key_for_cover_is_chosen"
         private const val PLAYLIST_NAME_KEY = "key_for_playlist_name"
         private const val PLAYLIST_DESCRIPTION_KEY = "key_for_playlist_description"
+
+        const val ARGS_PLAYLIST_ID = "playlistId"
+        fun createArgs(playlistId: Int): Bundle =
+            bundleOf(ARGS_PLAYLIST_ID to playlistId)
     }
 
     private var _binding: FragmentNewPlaylistBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
 
-    private val requester = PermissionRequester.instance()
-
-    private val viewModel: NewPlaylistViewModel by viewModel()
+    private val viewModel: NewPlaylistViewModel by viewModel() {
+        parametersOf(getPlaylistId())
+    }
 
     private var coverIsChosen = false
     private lateinit var coverImageUri: Uri
+    private var playlistId: Int = 0
+    private var playlistName = ""
 
     private lateinit var callbackOnBackPressed: OnBackPressedCallback
 
@@ -81,23 +88,34 @@ class NewPlaylistFragment : Fragment() {
                         requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
                         "myalbum"
                     )
-                val file = File(filePath, "temporary_cover.jpg")
+                val file = if (playlistId == 0) {
+                    File(filePath, "temporary_cover.jpg")
+                } else {
+                    File(filePath, "${playlistName}_cover.jpg")
+                }
                 coverImageUri = Uri.fromFile(file)
                 binding.cover.setImageURI(coverImageUri)
             }
         }
 
+        viewModel.observePlaylistInfo().observe(viewLifecycleOwner) {
+            drawScreen(it)
+        }
+
         viewModel.observeInsertingPlaylistIsComplete().observe(viewLifecycleOwner) {
             if (it) {
-                Toast.makeText(
-                    requireActivity(),
-                    getString(R.string.new_playlist_is_created),
-                    Toast.LENGTH_LONG
-                ).show()
-
+                if (playlistId == 0) {
+                    Toast.makeText(
+                        requireActivity(),
+                        getString(R.string.new_playlist_is_created),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
                 findNavController().navigateUp()
             }
         }
+
+        viewModel.getPlaylistInfoFromDatabase()
 
         binding.arrowBackImage.setOnClickListener {
             onBackPressed()
@@ -112,9 +130,16 @@ class NewPlaylistFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 if (uri != null) {
                     binding.cover.setImageURI(uri)
+                    binding.cover.background = null
                     coverIsChosen = true
                     coverImageUri = uri
-                    saveImageToPrivateStorage(coverImageUri, "temporary_cover.jpg")
+                    if (playlistId == 0) {
+                        saveImageToPrivateStorage(coverImageUri, "temporary_cover.jpg")
+                    } else {
+                        saveImageToPrivateStorage(coverImageUri, "${playlistName}_cover.jpg")
+
+                    }
+
                 } else {
                     Toast.makeText(
                         requireActivity(),
@@ -144,34 +169,7 @@ class NewPlaylistFragment : Fragment() {
                 before: Int,
                 count: Int
             ) {
-                if (binding.playlistName.hasFocus() && textSearch?.isEmpty() == true) {
-                    binding.newPlaylistButton.isEnabled = false
-                    binding.hintPlaylistName.isVisible = false
-                    binding.playlistName.background = ResourcesCompat.getDrawable(
-                        resources, R.drawable.rounded_rectangle, null
-                    )
-                    context?.let { binding.newPlaylistButton.setBackgroundColor(it.getColor(R.color.gray)) }
-                }
-                if (binding.playlistName.hasFocus() && textSearch?.isEmpty() == false) {
-                    binding.newPlaylistButton.isEnabled = true
-                    binding.hintPlaylistName.isVisible = true
-                    binding.playlistName.background = ResourcesCompat.getDrawable(
-                        resources, R.drawable.rounded_rectangle_blue, null
-                    )
-                    context?.let { binding.newPlaylistButton.setBackgroundColor(it.getColor(R.color.blue)) }
-                }
-                if (binding.playlistDescription.hasFocus() && textSearch?.isEmpty() == true) {
-                    binding.hintPlaylistDescription.isVisible = false
-                    binding.playlistDescription.background = ResourcesCompat.getDrawable(
-                        resources, R.drawable.rounded_rectangle, null
-                    )
-                }
-                if (binding.playlistDescription.hasFocus() && textSearch?.isEmpty() == false) {
-                    binding.hintPlaylistDescription.isVisible = true
-                    binding.playlistDescription.background = ResourcesCompat.getDrawable(
-                        resources, R.drawable.rounded_rectangle_blue, null
-                    )
-                }
+                setEditTextState(textSearch.toString())
             }
 
             override fun afterTextChanged(textSearch: Editable?) {
@@ -182,9 +180,8 @@ class NewPlaylistFragment : Fragment() {
         binding.playlistDescription.addTextChangedListener(simpleTextWatcher)
 
         binding.newPlaylistButton.setOnClickListener {
-            if (coverIsChosen) {
+            if (coverIsChosen && playlistId == 0) {
                 saveImageToPrivateStorage(coverImageUri, "${binding.playlistName.text}_cover.jpg")
-                Log.e("AAA", "${binding.playlistName.text}_cover.jpg")
             }
             viewModel.insertPlaylistInDatabase(
                 binding.playlistName.text.toString(),
@@ -222,20 +219,97 @@ class NewPlaylistFragment : Fragment() {
     }
 
     private fun onBackPressed() {
-        if (coverIsChosen || binding.playlistName.text.isNotEmpty() || binding.playlistDescription.text.isNotEmpty()) {
-            context?.let { it1 ->
-                MaterialAlertDialogBuilder(it1)
-                    .setTitle(getString(R.string.finish_creation))
-                    .setMessage(getString(R.string.unsaved_data_will_be_lost))
-                    .setNeutralButton(getString(R.string.cancel)) { dialog, which ->
-                    }
-                    .setPositiveButton(getString(R.string.finish)) { dialog, which ->
-                        findNavController().navigateUp()
-                    }
-                    .show()
+        if (playlistId == 0) {
+            if (coverIsChosen || binding.playlistName.text.isNotEmpty() || binding.playlistDescription.text.isNotEmpty()) {
+                context?.let { it1 ->
+                    MaterialAlertDialogBuilder(it1)
+                        .setTitle(getString(R.string.finish_creation))
+                        .setMessage(getString(R.string.unsaved_data_will_be_lost))
+                        .setNeutralButton(getString(R.string.cancel)) { dialog, which ->
+                        }
+                        .setPositiveButton(getString(R.string.finish)) { dialog, which ->
+                            findNavController().navigateUp()
+                        }
+                        .show()
+                }
+            } else {
+                findNavController().navigateUp()
             }
         } else {
             findNavController().navigateUp()
+        }
+
+    }
+
+    private fun getPlaylistId(): Int {
+        return requireArguments().getInt(ARGS_PLAYLIST_ID)
+    }
+
+    private fun drawScreen(playlist: Playlist) {
+        getCoverImage(playlist.playlistName)
+        if (coverIsChosen) {
+            binding.cover.setImageURI(coverImageUri)
+            binding.cover.background = null
+        }
+        binding.playlistName.setText(playlist.playlistName)
+        binding.hintPlaylistName.isVisible = true
+        binding.playlistName.background = ResourcesCompat.getDrawable(
+            resources, R.drawable.rounded_rectangle_blue, null
+        )
+        binding.playlistDescription.setText(playlist.playlistDescription)
+        if (playlist.playlistDescription.isNotEmpty()) {
+            binding.hintPlaylistDescription.isVisible = true
+            binding.playlistDescription.background = ResourcesCompat.getDrawable(
+                resources, R.drawable.rounded_rectangle_blue, null
+            )
+        }
+        binding.fragmentName.text = getString(R.string.edit)
+        binding.newPlaylistButton.text = getString(R.string.save)
+        binding.newPlaylistButton.isEnabled = true
+        context?.let { binding.newPlaylistButton.setBackgroundColor(it.getColor(R.color.blue)) }
+        playlistId = playlist.playlistId
+        playlistName = playlist.playlistName
+    }
+
+    private fun getCoverImage(playlistName: String): File {
+        val filePath =
+            File(requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myalbum")
+        val file = File(filePath, "${playlistName}_cover.jpg")
+        if (file.exists()) {
+            coverIsChosen = true
+            coverImageUri = Uri.fromFile(file)
+        }
+        return file
+    }
+
+    private fun setEditTextState(text: String) {
+        if (binding.playlistName.hasFocus() && text.isEmpty()) {
+            binding.newPlaylistButton.isEnabled = false
+            binding.hintPlaylistName.isVisible = false
+            binding.playlistName.background = ResourcesCompat.getDrawable(
+                resources, R.drawable.rounded_rectangle, null
+            )
+            context?.let { binding.newPlaylistButton.setBackgroundColor(it.getColor(R.color.gray)) }
+        }
+        if (binding.playlistName.hasFocus() && text.isNotEmpty()) {
+            binding.newPlaylistButton.isEnabled = true
+            binding.hintPlaylistName.isVisible = true
+            binding.playlistName.background = ResourcesCompat.getDrawable(
+                resources, R.drawable.rounded_rectangle_blue, null
+            )
+            context?.let { binding.newPlaylistButton.setBackgroundColor(it.getColor(R.color.blue)) }
+        }
+        if (binding.playlistDescription.hasFocus() && text.isEmpty()) {
+            binding.hintPlaylistDescription.isVisible = false
+            binding.playlistDescription.background = ResourcesCompat.getDrawable(
+                resources, R.drawable.rounded_rectangle, null
+            )
+        }
+        if (binding.playlistDescription.hasFocus() && text.isNotEmpty()) {
+            binding.hintPlaylistDescription.isVisible = true
+            binding.playlistDescription.background = ResourcesCompat.getDrawable(
+                resources, R.drawable.rounded_rectangle_blue, null
+            )
         }
     }
 

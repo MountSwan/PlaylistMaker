@@ -5,7 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
 
-class PlaylistAdapter() : RecyclerView.Adapter<PlaylistViewHolder>() {
+class PlaylistAdapter(private val clickListener: PlaylistClickListener) :
+    RecyclerView.Adapter<PlaylistViewHolder>() {
     var playlists = ArrayList<PlaylistUI>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
@@ -20,5 +21,10 @@ class PlaylistAdapter() : RecyclerView.Adapter<PlaylistViewHolder>() {
 
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
         holder.bind(playlists[position])
+        holder.itemView.setOnClickListener { clickListener.onPlaylistClick(playlists[position]) }
+    }
+
+    fun interface PlaylistClickListener {
+        fun onPlaylistClick(playlist: PlaylistUI)
     }
 }

@@ -22,7 +22,7 @@ class PlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             .centerCrop()
             .transform(RoundedCorners(itemView.resources.getDimensionPixelSize(R.dimen.four_space)))
             .into(ivCover)
-        tvPlaylistName.text = playlist.playlistName
+        tvPlaylistName.text = "${playlist.playlistName}"
         tvTracksNumber.text = "${playlist.numberOfTracksInPlaylist} $endOfTracksNumberText"
     }
 

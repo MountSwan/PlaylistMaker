@@ -13,4 +13,5 @@
     <color name="background_edit_text">#E6E8EB</color>
     <color name="cancel_color">#99A2AD</color>
     <color name="search_16_color">#818C99</color>
+    <color name="light_gray">#E6E8EB</color>
 </resources>

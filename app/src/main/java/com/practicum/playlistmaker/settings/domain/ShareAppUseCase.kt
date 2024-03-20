@@ -1,5 +1,5 @@
 package com.practicum.playlistmaker.settings.domain
 
 interface ShareAppUseCase {
-    fun execute()
+    fun execute(shareMessage: String)
 }

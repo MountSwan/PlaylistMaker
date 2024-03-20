@@ -2,7 +2,7 @@ package com.practicum.playlistmaker.settings.domain
 
 interface ExternalNavigator {
 
-    fun shareIntent()
+    fun shareIntent(shareMessage: String)
 
     fun getSupport()
 

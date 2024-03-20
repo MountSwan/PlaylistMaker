@@ -34,8 +34,8 @@ class SettingsViewModel(
         editSharedPrefs.execute(checked)
     }
 
-    fun shareApp() {
-        shareApp.execute()
+    fun shareApp(shareMessage: String) {
+        shareApp.execute(shareMessage)
     }
 
     fun getSupport() {

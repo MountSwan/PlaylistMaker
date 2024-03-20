@@ -20,14 +20,20 @@
     <dimen name="twelve_space">48dp</dimen>
     <dimen name="twelve_and_a_half_space">50dp</dimen>
     <dimen name="fourteen_space">56dp</dimen>
+    <dimen name="fifteen_space">60dp</dimen>
     <dimen name="twenty_space">80dp</dimen>
     <dimen name="twenty_six_space">104dp</dimen>
     <dimen name="thirty_three_space">132dp</dimen>
+    <dimen name="sixty_six_and_a_half_space">266dp</dimen>
+    <dimen name="seventy_two_and_a_half_space">290dp</dimen>
+    <dimen name="ninety_six_space">384dp</dimen>
     <dimen name="eleven_size_text">11sp</dimen>
     <dimen name="twelve_size_text">12sp</dimen>
     <dimen name="thirteen_size_text">13sp</dimen>
     <dimen name="fourteen_size_text">14sp</dimen>
     <dimen name="sixteen_size_text">16sp</dimen>
+    <dimen name="eighteen_size_text">18sp</dimen>
     <dimen name="nineteen_size_text">19sp</dimen>
     <dimen name="twenty_two_size_text">22sp</dimen>
+    <dimen name="twenty_four_size_text">24sp</dimen>
 </resources>
