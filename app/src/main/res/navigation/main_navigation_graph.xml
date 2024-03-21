@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_libraryFragment_to_audioPlayerFragment"
             app:destination="@id/audioPlayerFragment" />
+        <action
+            android:id="@+id/action_libraryFragment_to_playlistInfoFragment"
+            app:destination="@id/playlistInfoFragment" />
 
 
     </fragment>
@@ -57,6 +60,18 @@
         tools:layout="@layout/fragment_audio_player" >
         <action
             android:id="@+id/action_audioPlayerFragment_to_newPlaylistFragment"
+            app:destination="@id/newPlaylistFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/playlistInfoFragment"
+        android:name="com.practicum.playlistmaker.library.ui.PlaylistInfoFragment"
+        android:label="fragment_playlist_info"
+        tools:layout="@layout/fragment_playlist_info" >
+        <action
+            android:id="@+id/action_playlistInfoFragment_to_audioPlayerFragment"
+            app:destination="@id/audioPlayerFragment" />
+        <action
+            android:id="@+id/action_playlistInfoFragment_to_newPlaylistFragment"
             app:destination="@id/newPlaylistFragment" />
     </fragment>
 </navigation>

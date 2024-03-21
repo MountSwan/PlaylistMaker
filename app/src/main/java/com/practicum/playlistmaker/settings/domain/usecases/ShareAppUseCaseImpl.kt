@@ -5,7 +5,7 @@ import com.practicum.playlistmaker.settings.domain.ShareAppUseCase
 
 class ShareAppUseCaseImpl(private val externalNavigator: ExternalNavigator):
     ShareAppUseCase {
-    override fun execute() {
-        externalNavigator.shareIntent()
+    override fun execute(shareMessage: String) {
+        externalNavigator.shareIntent(shareMessage)
     }
 }

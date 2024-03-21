@@ -15,6 +15,14 @@ class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository)
         return playlistRepository.getPlaylists()
     }
 
+    override fun getPlaylistInfo(playlistId: Int): Flow<Playlist> {
+        return playlistRepository.getPlaylistInfo(playlistId)
+    }
+
+    override suspend fun deletePlaylist(playlistId: Int) {
+        playlistRepository.deletePlaylist(playlistId)
+    }
+
     override fun getListOfTracksId(listOfTracksIdInJson: String): ArrayList<Long> {
         return playlistRepository.getListOfTracksId(listOfTracksIdInJson)
     }
@@ -33,5 +41,13 @@ class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository)
 
     override fun getDataBaseIdOfTracksInPlaylists(): Flow<ArrayList<Int>> {
         return playlistRepository.getDataBaseIdOfTracksInPlaylists()
+    }
+
+    override fun getTrack(trackId: Long): Flow<Track> {
+        return playlistRepository.getTrack(trackId)
+    }
+
+    override suspend fun deleteTrack(trackId: Long) {
+        playlistRepository.deleteTrack(trackId)
     }
 }

@@ -73,8 +73,6 @@ class TracksSearchViewModel(
             searchState.tracksInHistorySize = tracksInHistory.size
             tracksInHistoryLiveData.postValue(tracksInHistory)
         }
-        /*searchState.tracksInHistorySize = tracksInHistory.size
-        tracksInHistoryLiveData.value = tracksInHistory*/
     }
 
     fun tracksClear() {

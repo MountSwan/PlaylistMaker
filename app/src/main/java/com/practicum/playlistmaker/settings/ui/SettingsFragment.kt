@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.practicum.playlistmaker.App
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentSettingsBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -39,7 +40,7 @@ class SettingsFragment : Fragment() {
         }
 
         binding.ivShare.setOnClickListener {
-            viewModel.shareApp()
+            viewModel.shareApp(getString(R.string.share_message))
         }
 
         binding.ivSupport.setOnClickListener {

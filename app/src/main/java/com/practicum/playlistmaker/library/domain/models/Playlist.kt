@@ -1,9 +1,9 @@
 package com.practicum.playlistmaker.library.domain.models
 
 data class Playlist(
-    val playlistId: Int,
-    val playlistName: String,
-    val playlistDescription: String,
-    val listOfTracksId: String,
-    val numberOfTracksInPlaylist: Int,
+    var playlistId: Int,
+    var playlistName: String,
+    var playlistDescription: String,
+    var listOfTracksId: String,
+    var numberOfTracksInPlaylist: Int,
 )

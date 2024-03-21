@@ -10,6 +10,10 @@ interface PlaylistRepository {
 
     fun getPlaylists(): Flow<ArrayList<Playlist>>
 
+    fun getPlaylistInfo(playlistId: Int): Flow<Playlist>
+
+    suspend fun deletePlaylist(playlistId: Int)
+
     fun getListOfTracksId(listOfTracksIdInJson: String): ArrayList<Long>
 
     fun getTracksIdInPlaylists(): Flow<ArrayList<Long>>
@@ -19,5 +23,9 @@ interface PlaylistRepository {
     suspend fun insertTrackInPlaylist(track: Track)
 
     fun getDataBaseIdOfTracksInPlaylists(): Flow<ArrayList<Int>>
+
+    fun getTrack(trackId: Long): Flow<Track>
+
+    suspend fun deleteTrack(trackId: Long)
 
 }

@@ -29,6 +29,16 @@ class PlaylistRepositoryImpl(
         emit(playlists)
     }
 
+    override fun getPlaylistInfo(playlistId: Int): Flow<Playlist> = flow {
+        val playlist =
+            playlistDbConvertor.map(appDatabase.playlistDao().getPlaylistInfo(playlistId))
+        emit(playlist)
+    }
+
+    override suspend fun deletePlaylist(playlistId: Int) {
+        appDatabase.playlistDao().deletePlaylist(playlistId)
+    }
+
     override fun getListOfTracksId(listOfTracksIdInJson: String): ArrayList<Long> {
         val listOfTracksIdFromJson = gson.fromJson(listOfTracksIdInJson, Array<Long>::class.java)
         val listOfTracksId = ArrayList<Long>()
@@ -58,6 +68,15 @@ class PlaylistRepositoryImpl(
             appDatabase.tracksInPlaylistsDao().getDataBaseIdOfTracksInPlaylists()
         dataBaseId.addAll(dataBaseIdInDatabase)
         emit(dataBaseId)
+    }
+
+    override fun getTrack(trackId: Long): Flow<Track> = flow {
+        val trackInDatabase = appDatabase.tracksInPlaylistsDao().getTrack(trackId)
+        emit(trackInPlaylistDbConvertor.map(trackInDatabase))
+    }
+
+    override suspend fun deleteTrack(trackId: Long) {
+        appDatabase.tracksInPlaylistsDao().deleteTrack(trackId)
     }
 
     private fun convertFromPlaylistEntity(playlists: List<PlaylistEntity>): List<Playlist> {

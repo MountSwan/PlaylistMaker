@@ -8,10 +8,10 @@ import com.practicum.playlistmaker.settings.domain.ExternalNavigator
 
 class ExternalNavigatorImpl(private val context: Context): ExternalNavigator {
 
-    override fun shareIntent() {
+    override fun shareIntent(shareMessage: String) {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, context.getString(R.string.share_message))
+            putExtra(Intent.EXTRA_TEXT, shareMessage)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         context.startActivity(shareIntent)

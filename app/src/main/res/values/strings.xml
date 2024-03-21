@@ -29,8 +29,10 @@
     <string name="new_playlist_is_created" translatable="false">Новый плейлист создан</string>
     <string name="empty_library" translatable="false">Ваша медиатека пуста</string>
     <string name="no_playlist" translatable="false">Вы не создали\nни одного плейлиста</string>
+    <string name="no_tracks_in_playlist" translatable="false">В плейлист еще не добавлен\nни один трек</string>
     <string name="favorite_tracks" translatable="false">Избранные треки</string>
     <string name="playlists" translatable="false">Плейлисты</string>
+    <string name="playlist" translatable="false">Плейлист</string>
     <string name="name" translatable="false">Название*</string>
     <string name="playlist_name" translatable="false">Название плейлиста</string>
     <string name="playlists_tracks_number" translatable="false">Число треков в плейлисте</string>
@@ -49,4 +51,19 @@
     <string name="track" translatable="false">трек</string>
     <string name="of_track" translatable="false">трека</string>
     <string name="of_tracks" translatable="false">треков</string>
+    <string name="minute" translatable="false">минута</string>
+    <string name="minutes" translatable="false">минуты</string>
+    <string name="of_minutes" translatable="false">минут</string>
+    <string name="delete_track" translatable="false">Удалить трек</string>
+    <string name="delete_playlist" translatable="false">Удалить плейлист</string>
+    <string name="request_delete_playlist" translatable="false">Хотите удалить плейлист</string>
+    <string name="confirmation_delete_track" translatable="false">Вы уверены, что хотите удалить трек из плейлиста?</string>
+    <string name="delete" translatable="false">Удалить</string>
+    <string name="share_is_not_possible" translatable="false">В этом плейлисте нет списка треков, которым можно поделиться</string>
+    <string name="share" translatable="false">Поделиться</string>
+    <string name="edit_info" translatable="false">Редактировать информацию</string>
+    <string name="yes" translatable="false">Да</string>
+    <string name="no" translatable="false">Нет</string>
+    <string name="edit" translatable="false">Редактировать</string>
+    <string name="save" translatable="false">Сохранить</string>
 </resources>
